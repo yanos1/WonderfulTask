@@ -127,7 +127,7 @@ with st.sidebar:
             os.environ["ANTHROPIC_API_KEY"] = k
 
     lam = st.slider(
-        "LLM influence (λ)", 0.0, 1.0, 0.0, 0.05,
+        "LLM influence (λ)", 0.0, 1.0, 0.5, 0.05,
         help="How much the LLM may adjust deterministic scores, when calculating an investment score. 0 = pure deterministic; "
              "1 = ±40% max, and only with written justifications.",
     )

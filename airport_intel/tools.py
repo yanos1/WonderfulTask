@@ -21,9 +21,8 @@ from .scoring import ScoringEngine
 # Caveats surfaced to the user so the agent can communicate uncertainty honestly.
 DATA_NOTES = [
     "Volume and YoY growth are current (FAA CY2024 enplanements, 2024 vs 2023).",
-    "Structural ratios (load factor, long-haul %) are derived from 2013 BTS T-100 segment "
-    "data — the most recent reliably-accessible segment-level source. Relative rankings are "
-    "informative; absolute load factors are conservative vs. today.",
+    "Structural ratios (load factor, long-haul %) are derived from 2024 BTS T-100 Domestic "
+    "Segment data (the segment-level source carrying seats and distance).",
     "Long-haul % is domestic-only (international segments not yet ingested), so it understates "
     "long-haul share at international gateways.",
 ]

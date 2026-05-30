@@ -1,16 +1,15 @@
 """ETL: build airports.json from public aviation data (no API keys required).
 
-Vintage strategy "B" (documented as an explicit assumption in DESIGN.md):
+Vintage strategy (documented as an explicit assumption in DESIGN.md):
   - Current volume + YoY growth come from FAA CY2024 enplanements (2024 vs 2023).
-  - Structural ratios (load factor, long-haul share) come from the 2013 T-100 segment
-    file -- the most recent reliably/programmatically downloadable segment-level data
-    (which uniquely carries SEATS and DISTANCE). Industry load factors have risen since
-    2013, so absolute values are conservative, but the *relative* ranking across airports
-    -- which is what the EPI uses -- remains informative.
+  - Structural ratios (load factor, long-haul share) come from the BTS T-100 Domestic
+    Segment file for BASE_YEAR (2024), fetched live from TranStats by etl.fetch_t100_segment
+    (it uniquely carries SEATS and DISTANCE). If that fetch fails the build fails loud rather
+    than shipping a stale vintage; the committed data/airports.json is left untouched.
 
 Sources (all public, keyless):
   - OurAirports airports.csv + runways.csv  -> metadata + runways (feasibility proxy)
-  - BTS T-100 Domestic Segment 2013 (dannguyen GitHub mirror) -> load factor, long-haul %
+  - BTS T-100 Domestic Segment (All Carriers), live from TranStats -> load factor, long-haul %
   - FAA CY2024 commercial-service enplanements -> current volume + YoY growth
 
 Run:  python -m etl.build_airports        (full build -> data/airports.json)
@@ -20,11 +19,13 @@ import json
 import os
 import urllib.request
 import warnings
+import zipfile
 from datetime import datetime, timezone
 
 import pandas as pd
 
 from airport_intel.models import Airport
+from etl import fetch_t100_segment
 
 SCHEMA_VERSION = 1
 
@@ -40,17 +41,15 @@ OUT_PATH = os.path.join(DATA_DIR, "airports.json")
 
 OURAIRPORTS_AIRPORTS = "https://davidmegginson.github.io/ourairports-data/airports.csv"
 OURAIRPORTS_RUNWAYS = "https://davidmegginson.github.io/ourairports-data/runways.csv"
-T100_2013 = (
-    "https://raw.githubusercontent.com/dannguyen/bts-transstats-t100-domestic-demo/"
-    "master/data/T_T100D_SEGMENT_US_CARRIER_ONLY_2013_All.csv"
-)
+# Segment source: live BTS T-100, fetched per-year by etl.fetch_t100_segment.
+T100_SOURCE = "BTS TranStats T-100 Domestic Segment (All Carriers), DL_SelectFields gnoyr_VQ=GEE"
 FAA_ENPLANEMENTS = (
     "https://www.faa.gov/airports/planning_capacity/passenger_allcargo_stats/"
     "passenger/arp-cy2024-commercial-service-enplanements.xlsx"
 )
 FAA_UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}  # FAA blocks default agents
 
-BASE_YEAR = 2013          # vintage of the segment-level (seats/distance) data
+BASE_YEAR = 2024          # vintage of the segment-level (seats/distance) data; was 2013
 CURRENT_YEAR = 2024       # vintage of FAA enplanement volume + growth
 LONG_HAUL_MILES = 2500    # a flight is "long haul" if its segment distance exceeds this
 # Service classes to KEEP (passenger service). Excludes all-cargo classes G and P,
@@ -112,9 +111,26 @@ def load_ourairports():
     return meta, runways
 
 
-def load_t100_2013():
-    """Aggregate 2013 segment data by origin: 2013 passengers, load factor, long-haul %."""
-    df = pd.read_csv(download(T100_2013, "t100_segment_2013.csv"), low_memory=False)
+def _read_t100_frame(year: int):
+    """Return a DataFrame of raw T-100 segment rows for `year`.
+
+    Source is the live BTS T-100 Domestic Segment (All Carriers) file, fetched on demand
+    into data/raw and read from its zip. We deliberately do NOT fall back to an older
+    vintage: shipping stale ratios silently would be worse than not rebuilding. The
+    committed data/airports.json is the safety net -- a failed rebuild leaves it untouched
+    rather than overwriting current data with a degraded one.
+    """
+    zip_path = os.path.join(RAW_DIR, f"t100_segment_{year}.zip")
+    if not os.path.exists(zip_path):
+        zip_path = fetch_t100_segment.fetch(year)  # raises (fails loud) if TranStats is down
+    with zipfile.ZipFile(zip_path) as zf:
+        name = next(n for n in zf.namelist() if n.upper().startswith("T_T100"))
+        return pd.read_csv(zf.open(name), low_memory=False)
+
+
+def load_t100(year: int = BASE_YEAR):
+    """Aggregate T-100 segment data by origin: passengers, load factor, long-haul %."""
+    df = _read_t100_frame(year)
     # keep passenger service classes only (drop all-cargo) and rows with real capacity
     df = df[df["CLASS"].isin(PASSENGER_CLASSES)].copy()
     df["ORIGIN"] = df["ORIGIN"].str.upper()
@@ -122,20 +138,20 @@ def load_t100_2013():
     df["lh_departures"] = df["DEPARTURES_PERFORMED"].where(df["DISTANCE"] > LONG_HAUL_MILES, 0.0)
 
     grp = df.groupby("ORIGIN").agg(
-        passengers_2013=("PASSENGERS", "sum"),
-        seats_2013=("SEATS", "sum"),
-        departures_2013=("DEPARTURES_PERFORMED", "sum"),
+        passengers=("PASSENGERS", "sum"),
+        seats=("SEATS", "sum"),
+        departures=("DEPARTURES_PERFORMED", "sum"),
         lh_departures=("lh_departures", "sum"),
     )
 
     out = {}
     for iata, r in grp.iterrows():
-        seats = r["seats_2013"]
-        deps = r["departures_2013"]
+        seats = r["seats"]
+        deps = r["departures"]
         out[iata] = {
-            "passengers_2013": float(r["passengers_2013"]),
-            "departures_2013": float(deps),
-            "load_factor": round(float(r["passengers_2013"] / seats), 4) if seats > 0 else None,
+            "passengers_hist": float(r["passengers"]),
+            "departures_hist": float(deps),
+            "load_factor": round(float(r["passengers"] / seats), 4) if seats > 0 else None,
             "long_haul_pct": round(float(r["lh_departures"] / deps), 4) if deps > 0 else None,
         }
     return out
@@ -175,27 +191,28 @@ def load_faa_enplanements():
 def build():
     print("Loading OurAirports ...")
     meta, runways = load_ourairports()
-    print("Loading BTS T-100 2013 segment ...")
-    t13 = load_t100_2013()
+    print(f"Loading BTS T-100 {BASE_YEAR} segment ...")
+    seg = load_t100(BASE_YEAR)
     print("Loading FAA CY2024 enplanements ...")
     faa = load_faa_enplanements()
 
-    # union of airports with current (FAA) or historical (T-100) passenger activity
-    codes = set(faa.keys()) | set(t13.keys())
+    # union of airports with current (FAA) or segment (T-100) passenger activity
+    codes = set(faa.keys()) | set(seg.keys())
     airports = {}
     for iata in sorted(codes):
         if iata not in meta:
             continue  # need metadata (name/city/state) to be useful
         cur = faa.get(iata)
-        hist = t13.get(iata, {})
+        hist = seg.get(iata, {})
 
-        # Volume + growth: prefer current FAA (2024); else fall back to 2013 baseline.
+        # Volume + growth: prefer current FAA (2024); else fall back to the T-100 segment
+        # passenger count (same BASE_YEAR vintage).
         if cur and cur.get("enplanements"):
             volume, vintage, growth = cur["enplanements"], CURRENT_YEAR, cur.get("growth")
         else:
-            volume, vintage, growth = (hist.get("passengers_2013") or 0), BASE_YEAR, None
+            volume, vintage, growth = (hist.get("passengers_hist") or 0), BASE_YEAR, None
 
-        deps = hist.get("departures_2013")
+        deps = hist.get("departures_hist")
         airports[iata] = {
             "iata": iata,
             **meta[iata],
@@ -203,7 +220,7 @@ def build():
             "passengers": round(volume),
             "passengers_vintage": vintage,
             "departures": round(deps) if deps else None,
-            # structural ratios (2013)
+            # structural ratios (T-100 segment, BASE_YEAR)
             "load_factor": hist.get("load_factor"),
             "long_haul_pct": hist.get("long_haul_pct"),
             # growth: FAA CY2024 vs CY2023 YoY (None when current data is unavailable)
@@ -223,11 +240,11 @@ def build():
         "record_count": len(airports),
         "vintages": {
             "volume_and_growth": CURRENT_YEAR,   # FAA enplanements (current)
-            "structural_ratios": BASE_YEAR,       # load factor, long-haul % (T-100 baseline)
+            "structural_ratios": BASE_YEAR,       # load factor, long-haul % (T-100 segment)
         },
         "sources": {
             "metadata_runways": OURAIRPORTS_AIRPORTS,
-            "segment_ratios": T100_2013,
+            "segment_ratios": T100_SOURCE,
             "enplanements": FAA_ENPLANEMENTS,
         },
     }

@@ -104,7 +104,7 @@ deterministic layer uses while giving new code typed attribute access.
 
 **Provenance.** The artifact is wrapped as `{"_meta": {...}, "airports": {...}}`; `_meta`
 records `schema_version`, `generated_at`, `record_count`, the per-signal vintages (volume/
-growth = 2024, structural ratios = 2013), and the source URLs — so any dataset is auditable
+growth = 2024, structural ratios = 2024), and the source URLs — so any dataset is auditable
 and reproducible (`repo.meta` exposes it).
 
 **Owned tradeoffs.** (1) The derived `airports.json` is **committed to git** — a deliberate
@@ -134,18 +134,19 @@ where an index would go if `n` grew.
 
 ## 6. Assumptions, uncertainty & scoping
 
-- **Mixed vintage (deliberate):** volume + YoY growth are **current** (FAA CY2024
-  enplanements, 2024 vs 2023); load factor and long-haul % are from **2013** BTS T-100
-  segment data (the most recent reliably/programmatically downloadable segment-level source
-  with seats + distance). Industry load factors have risen since, so absolute values are
-  conservative, but the *relative* ranking the EPI uses remains informative. ETL is
-  year-parameterized.
+- **Current throughout:** volume + YoY growth are **current** (FAA CY2024 enplanements,
+  2024 vs 2023); load factor and long-haul % are from **2024** BTS T-100 Domestic Segment
+  data, pulled live from TranStats (`etl/fetch_t100_segment.py`, which selects just the seven
+  fields the build needs and zips a single year). ETL is year-parameterized via `BASE_YEAR`.
 - **Long-haul is domestic-only** — international segments not yet ingested — so it understates
   long-haul share at international gateways (ANC, SFO).
-- **Resilience:** the 2024 NTAD path we first tried is a restricted hosted view that rejects
-  feature queries; the ETL falls back per-airport to the 2013 baseline and records the
-  vintage, rather than failing. (Volume/growth now come from FAA; the fallback remains for
-  airports absent from the FAA file.)
+- **Why the raw TranStats file (not the easy APIs):** the pre-aggregated NTAD/Socrata 2024
+  views expose passengers by origin but drop **seats and distance**, so they can't produce
+  load factor or long-haul %; only the raw TranStats segment file carries them.
+- **No stale fallback in the ETL:** if the live fetch is unreachable the build fails loud
+  rather than silently shipping an older vintage. The committed `data/airports.json` (already
+  current) is the safety net — a failed rebuild leaves it untouched. Runtime "graceful
+  degradation" is a separate concern (the app degrades to keyword routing without an API key).
 - **Cargo out of scope:** the thesis is passenger/terminal expansion; all-cargo service
   classes are filtered out, so cargo-dominant airports (ANC) are judged on passenger terms.
 - **Feasibility ≠ true headroom:** runways proxy for physical room.

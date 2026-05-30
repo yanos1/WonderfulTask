@@ -46,8 +46,8 @@ You ─► Streamlit chat
 ```
 
 - **Data** (`etl/build_airports.py` → `data/airports.json`): OurAirports (metadata, runways)
-  + BTS T-100 2013 segment data (load factor, long-haul %) + FAA CY2024 enplanements (current
-  volume + YoY growth) + runway-based feasibility — derived for ~900 US airports.
+  + BTS T-100 2024 segment data (load factor, long-haul %) + FAA CY2024 enplanements (current
+  volume + YoY growth) + runway-based feasibility — derived for ~1,000 US airports.
 - **Scoring** (`airport_intel/scoring.py`): `EPI = demand × feasibility × 100`, percentile-normalized.
 - **Tools** (`airport_intel/tools.py`): pure-Python, the graded non-LLM logic.
 - **Agent** (`airport_intel/agent.py`): route → execute → revise → narrate, with conversation
@@ -69,6 +69,7 @@ airport_intel/               core package — all runtime logic
   regions.py                 US region → state resolution
   llm/                       swappable providers (Gemini | Claude) behind one primitive
 etl/build_airports.py        offline build pipeline (public data → data/airports.json)
+etl/fetch_t100_segment.py    pulls a year of BTS T-100 segment data live from TranStats
 tests/                       scoring + resolution unit tests
 ```
 
@@ -79,14 +80,16 @@ python -m pytest -q
 ```
 
 ## Key assumptions (full list in DESIGN.md)
-- **Mixed vintage (by design):** volume + YoY growth are current (**FAA CY2024
-  enplanements**, 2024 vs 2023); structural ratios (load factor, long-haul %) come from
-  **2013** BTS T-100 segment data — the most recent reliably/programmatically downloadable
-  segment-level source. Relative rankings are informative; the ETL is year-parameterized.
+- **Current throughout:** volume + YoY growth come from **FAA CY2024 enplanements** (2024 vs
+  2023); structural ratios (load factor, long-haul %) come from **2024 BTS T-100 Domestic
+  Segment** data, fetched live from TranStats (`etl/fetch_t100_segment.py`). The ETL is
+  year-parameterized (`BASE_YEAR`), so a later vintage is a one-line change.
 - **Long-haul is domestic-only** (international segments not yet ingested) → understates
   long-haul at international gateways.
-- **Graceful degradation:** if a current source is unreachable, the pipeline falls back to
-  the 2013 baseline per airport and discloses the vintage rather than failing.
+- **Graceful degradation (runtime, not the ETL):** the app always stays demoable — no API
+  key → keyword routing + templated answers; it reads the committed `data/airports.json`.
+  The build-time ETL deliberately does *not* fall back to a stale segment vintage: if the
+  live TranStats fetch fails it errors out, leaving the current committed dataset untouched.
 - **Cargo is out of scope** — the thesis is passenger/terminal expansion.
 
 ## With more time
