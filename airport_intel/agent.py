@@ -35,9 +35,15 @@ Tools:
 - flight_breakdown(code): long-haul flight share for one airport. Use for "long haul %".
 - explain: the user asks HOW a score was computed, the methodology, or "why these
   numbers/scores" about a PREVIOUS answer. No args.
-- none: the message is a greeting, thanks, smalltalk, or NOT about US airport investment
-  (e.g. "hi", "how are you", "what's the capital of France"). Use this whenever no tool
-  clearly applies. NEVER force a ranking or any other tool onto a non-airport message.
+- aviation_qa: the message is a genuine question about aviation in general -- airlines,
+  airports, air travel, runways/terminals, airport infrastructure, routes, regulation --
+  that no data tool above can answer from our dataset (e.g. "does JFK have room for new
+  rail links?", "how long is a typical runway?", "which airline flies the most
+  transatlantic routes?"). Answer it from general knowledge. No args.
+- none: the message is a greeting, thanks, smalltalk, or NOT about aviation at all
+  (e.g. "hi", "how are you", "what's the capital of France"). Use this whenever the
+  message is unrelated to airlines/airports. NEVER force a ranking or any other tool onto
+  a non-aviation message, and NEVER use aviation_qa for non-aviation messages.
 
 Given the conversation, output JSON ONLY:
 {"tool": "<tool name or 'none'>", "args": {...}, "assumptions": ["..."]}
@@ -93,6 +99,18 @@ For each airport you wish to adjust, return a modifier and a SPECIFIC factual re
 A modifier of 1.0 means no change. You MUST justify any modifier != 1.0; unjustified
 adjustments are discarded. Output JSON ONLY:
 {"modifiers": [{"iata": "SFO", "modifier": 1.08, "reason": "..."}]}"""
+
+AVIATION_QA_SYSTEM = """You are the assistant for an Airport Investment Intelligence tool.
+The user asked a genuine aviation question (airlines, airports, air travel, infrastructure,
+routes, regulation) that our internal dataset does NOT cover -- our data is limited to US
+airport passenger/flight capacity used for the expansion-profitability scoring.
+
+Answer helpfully from general knowledge in 1-3 short paragraphs. IMPORTANT: open with a
+brief, honest flag that this is general knowledge rather than a result from our dataset, so
+the user does not confuse it with our data-backed scores -- e.g. "This isn't from our
+capacity dataset, but in general...". Do not fabricate specific statistics, dates, or
+figures; if you are unsure, say so plainly. Where natural, connect the answer back to
+airport investment and invite a data-backed question."""
 
 HELP_SYSTEM = """You are the assistant for an Airport Investment Intelligence tool. The
 user's latest message is NOT a data request — it may be a greeting, a thank-you, or an
@@ -197,6 +215,11 @@ class Agent:
                  f"Question: {user_message}\n\nPrevious result JSON:\n{ctx}"}]
         return self.provider.complete(EXPLAIN_SYSTEM, msgs).strip()
 
+    # -- aviation general-knowledge Q&A (no data tool applies) ------------ #
+    def _aviation_qa(self, user_message: str) -> str:
+        msgs = self.history + [{"role": "user", "content": user_message}]
+        return self.provider.complete(AVIATION_QA_SYSTEM, msgs).strip()
+
     # -- help / smalltalk (greeting, thanks, or off-topic) ---------------- #
     def _help(self, user_message: str) -> str:
         return self.provider.complete(
@@ -215,6 +238,9 @@ class Agent:
         elif tool == "explain":
             result = {"intent": "explain"}
             answer = self._explain(user_message)
+        elif tool == "aviation_qa":
+            result = {"intent": "aviation_qa"}
+            answer = self._aviation_qa(user_message)
         else:  # tool == "none" / unrecognized -> greeting, thanks, or off-topic
             result = {"intent": "smalltalk"}
             answer = self._help(user_message)
