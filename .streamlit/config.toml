@@ -1,0 +1,3 @@
+[theme]
+# Dark mode is the default appearance for the app.
+base = "dark"

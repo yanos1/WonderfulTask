@@ -7,7 +7,6 @@ import os
 
 import pandas as pd
 import streamlit as st
-import streamlit.components.v1 as components
 from dotenv import load_dotenv
 
 from airport_intel.agent import Agent
@@ -134,28 +133,3 @@ if prompt := st.chat_input("Ask about US airport investment opportunities..."):
     st.session_state.messages.append(
         {"role": "assistant", "content": out["answer"], "result": out["result"]}
     )
-
-# Make "Clear cache" (c) and the dev "d" shortcut mouse-only: swallow the bare keys so
-# Streamlit's keyboard handlers never see them, while the top-right "⋮" menu still works.
-# Guarded so we don't interfere with typing or with Ctrl/Cmd combos (e.g. copy).
-components.html(
-    """
-    <script>
-    const doc = window.parent.document;
-    if (!doc.__shortcutGuardInstalled) {
-        doc.__shortcutGuardInstalled = true;
-        doc.addEventListener("keydown", function (e) {
-            const k = (e.key || "").toLowerCase();
-            if (k !== "c" && k !== "d") return;
-            if (e.ctrlKey || e.metaKey || e.altKey) return;   // leave copy/paste etc. alone
-            const el = doc.activeElement;
-            const tag = el ? el.tagName : "";
-            if (tag === "INPUT" || tag === "TEXTAREA" || (el && el.isContentEditable)) return;
-            e.stopImmediatePropagation();
-            e.preventDefault();
-        }, true);   // capture phase: run before Streamlit's own handler
-    }
-    </script>
-    """,
-    height=0,
-)
