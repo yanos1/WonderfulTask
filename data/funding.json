@@ -1,0 +1,4100 @@
+{
+  "_meta": {
+    "schema_version": 1,
+    "generated_at": "2026-05-30T16:33:07+00:00",
+    "program": "FAA IIJA Airport Terminal Program (ATP)",
+    "source_url": "https://www.faa.gov/iija/atp/ATP_Grant_Status_1-27-2026.xlsx",
+    "source_file": "ATP_Grant_Status_1-27-2026.xlsx",
+    "fiscal_years": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "vintage": "FY2022-FY2025 announced",
+    "record_count": 262,
+    "total_announced_usd": 3800727303,
+    "note": "Competitive terminal-development grants used as EXTERNAL GROUND TRUTH for the EPI backtest (airport_intel/backtest.py). Published FAA labels, not authored data."
+  },
+  "funding": {
+    "17G": {
+      "iata": "17G",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1900000,
+      "awarded_usd": 1718104,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "OH",
+      "city": "Bucyrus",
+      "name": "Port Bucyrus-Crawford County Airport"
+    },
+    "1B0": {
+      "iata": "1B0",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 760000,
+      "awarded_usd": 760000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "ME",
+      "city": "Dexter",
+      "name": "Dexter Regional Airport"
+    },
+    "2M8": {
+      "iata": "2M8",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1000000,
+      "awarded_usd": 1000000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "TN",
+      "city": "Millington",
+      "name": "Charles W. Baker Airport"
+    },
+    "3P3": {
+      "iata": "3P3",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 380000,
+      "awarded_usd": 342512,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "ND",
+      "city": "Mott",
+      "name": "Mott Municipal Airport"
+    },
+    "3W2": {
+      "iata": "3W2",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1900000,
+      "awarded_usd": 1900000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "OH",
+      "city": "Put-in-Bay",
+      "name": "Put-in-Bay Airport"
+    },
+    "4V4": {
+      "iata": "4V4",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 950000,
+      "awarded_usd": 950000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "ND",
+      "city": "Northwood",
+      "name": "Northwood Municipal Airport-Vince Field"
+    },
+    "7A8": {
+      "iata": "7A8",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 2000000,
+      "awarded_usd": 1543134,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "NC",
+      "city": "Spruce Pine",
+      "name": "Avery County Airport"
+    },
+    "81B": {
+      "iata": "81B",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 243825,
+      "awarded_usd": 243825,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "ME",
+      "city": "Oxford",
+      "name": "Oxford County Regional Airport"
+    },
+    "9D9": {
+      "iata": "9D9",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1800000,
+      "awarded_usd": 1604932,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "MI",
+      "city": "Hastings",
+      "name": "Hastings City/Barry County Airport"
+    },
+    "9V9": {
+      "iata": "9V9",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 855000,
+      "awarded_usd": 855000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "SD",
+      "city": "Chamberlain",
+      "name": "Chamberlain Municipal Airport"
+    },
+    "ABE": {
+      "iata": "ABE",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5000000,
+      "awarded_usd": 5000000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "PA",
+      "city": "Allentown",
+      "name": "Lehigh Valley International Airport"
+    },
+    "ABQ": {
+      "iata": "ABQ",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 19800000,
+      "awarded_usd": 19008525,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024
+      ],
+      "first_year": 2022,
+      "state": "NM",
+      "city": "Albuquerque",
+      "name": "Albuquerque International Sunport"
+    },
+    "ABR": {
+      "iata": "ABR",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 800000,
+      "awarded_usd": 800000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "SD",
+      "city": "Aberdeen",
+      "name": "Aberdeen Regional Airport"
+    },
+    "ACY": {
+      "iata": "ACY",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 4800000,
+      "awarded_usd": 4800000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "NJ",
+      "city": "Atlantic City",
+      "name": "Atlantic City International Airport"
+    },
+    "AGS": {
+      "iata": "AGS",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 7000000,
+      "awarded_usd": 8000000,
+      "fiscal_years": [
+        2023,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "GA",
+      "city": "Augusta",
+      "name": "Augusta Regional Airport"
+    },
+    "ALB": {
+      "iata": "ALB",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 12600000,
+      "awarded_usd": 12600000,
+      "fiscal_years": [
+        2023,
+        2024
+      ],
+      "first_year": 2023,
+      "state": "NY",
+      "city": "Albany",
+      "name": "Albany International Airport"
+    },
+    "ANC": {
+      "iata": "ANC",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 14680000,
+      "awarded_usd": 7975059,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "AK",
+      "city": "Anchorage",
+      "name": "Ted Stevens Anchorage International Airport"
+    },
+    "APA": {
+      "iata": "APA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 12000000,
+      "awarded_usd": 9798235,
+      "fiscal_years": [
+        2023,
+        2024
+      ],
+      "first_year": 2023,
+      "state": "CO",
+      "city": "Denver",
+      "name": "Centennial Airport"
+    },
+    "ASY": {
+      "iata": "ASY",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 950000,
+      "awarded_usd": 950000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "ND",
+      "city": "Ashley",
+      "name": "Ashley Municipal Airport"
+    },
+    "ATL": {
+      "iata": "ATL",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 58300000,
+      "awarded_usd": 44000000,
+      "fiscal_years": [
+        2022,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "GA",
+      "city": "Atlanta",
+      "name": "Hartsfield-Jackson Atlanta International Airport"
+    },
+    "ATW": {
+      "iata": "ATW",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 3420000,
+      "awarded_usd": 0,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "WI",
+      "city": "Appleton",
+      "name": "Appleton International Airport"
+    },
+    "AUS": {
+      "iata": "AUS",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 87780000,
+      "awarded_usd": 103772972,
+      "fiscal_years": [
+        2022,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "TX",
+      "city": "Austin",
+      "name": "Austin Bergstrom International Airport"
+    },
+    "AVL": {
+      "iata": "AVL",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 35000000,
+      "awarded_usd": 25000000,
+      "fiscal_years": [
+        2022,
+        2023
+      ],
+      "first_year": 2022,
+      "state": "NC",
+      "city": "Asheville",
+      "name": "Asheville Regional Airport"
+    },
+    "AWG": {
+      "iata": "AWG",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 129675,
+      "awarded_usd": 129675,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "IA",
+      "city": "Washington",
+      "name": "Washington Municipal Airport  (AWG)"
+    },
+    "BDL": {
+      "iata": "BDL",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 36400000,
+      "awarded_usd": 37390000,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "CT",
+      "city": "Windsor Locks",
+      "name": "Bradley International Airport"
+    },
+    "BFM": {
+      "iata": "BFM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 4000000,
+      "awarded_usd": 4000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "AL",
+      "city": "Mobile",
+      "name": "Mobile Airport Authority"
+    },
+    "BGM": {
+      "iata": "BGM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 7000000,
+      "awarded_usd": 0,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "NY",
+      "city": "Binghamton",
+      "name": "Greater Binghamton Airport"
+    },
+    "BGR": {
+      "iata": "BGR",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 14200000,
+      "awarded_usd": 12230421,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "ME",
+      "city": "Bangor",
+      "name": "Bangor International Airport"
+    },
+    "BHM": {
+      "iata": "BHM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5000000,
+      "awarded_usd": 4252630,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "AL",
+      "city": "Birmingham",
+      "name": "Birmingham-Shuttlesworth International Airport"
+    },
+    "BJI": {
+      "iata": "BJI",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 95000,
+      "awarded_usd": 0,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "MN",
+      "city": "Bemidji",
+      "name": "Bemidji Regional Airport"
+    },
+    "BKW": {
+      "iata": "BKW",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1000000,
+      "awarded_usd": 1432600,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "WV",
+      "city": "Beckley",
+      "name": "Raleigh County Memorial Airport"
+    },
+    "BNA": {
+      "iata": "BNA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 21700000,
+      "awarded_usd": 21700000,
+      "fiscal_years": [
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "TN",
+      "city": "Nashville",
+      "name": "Nashville International Airport"
+    },
+    "BOI": {
+      "iata": "BOI",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 10960000,
+      "awarded_usd": 1261496,
+      "fiscal_years": [
+        2022,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "ID",
+      "city": "Boise",
+      "name": "Boise Airport"
+    },
+    "BOS": {
+      "iata": "BOS",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 5,
+      "announced_usd": 106500000,
+      "awarded_usd": 103635850,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "MA",
+      "city": "Boston",
+      "name": "General Edward Lawrence Logan International Airport"
+    },
+    "BQN": {
+      "iata": "BQN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 9600000,
+      "awarded_usd": 9600000,
+      "fiscal_years": [
+        2023,
+        2024
+      ],
+      "first_year": 2023,
+      "state": "PR",
+      "city": "Aguadilla",
+      "name": "Rafael Hernandez Airport"
+    },
+    "BTR": {
+      "iata": "BTR",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5200000,
+      "awarded_usd": 5183806,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "LA",
+      "city": "Baton Rouge",
+      "name": "Baton Rouge Metropolitan Airport"
+    },
+    "BUF": {
+      "iata": "BUF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 19345520,
+      "awarded_usd": 14865157,
+      "fiscal_years": [
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "NY",
+      "city": "Buffalo",
+      "name": "Buffalo Niagara International Airport"
+    },
+    "BUR": {
+      "iata": "BUR",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 56628000,
+      "awarded_usd": 56628000,
+      "fiscal_years": [
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "CA",
+      "city": "Burbank",
+      "name": "Bob Hope (Hollywood Burbank) Airport"
+    },
+    "BWI": {
+      "iata": "BWI",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 52574160,
+      "awarded_usd": 52657943,
+      "fiscal_years": [
+        2023,
+        2024
+      ],
+      "first_year": 2023,
+      "state": "MD",
+      "city": "Baltimore",
+      "name": "Baltimore Washington International Thurgood Marshall Airport"
+    },
+    "BXG": {
+      "iata": "BXG",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 750000,
+      "awarded_usd": 750000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "GA",
+      "city": "Waynesboro",
+      "name": "Burke County Airport"
+    },
+    "BZN": {
+      "iata": "BZN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 10000000,
+      "awarded_usd": 10000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "MT",
+      "city": "Bozeman",
+      "name": "Bozeman Yellowstone International Airport"
+    },
+    "CAE": {
+      "iata": "CAE",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 8000000,
+      "awarded_usd": 6000000,
+      "fiscal_years": [
+        2023,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "SC",
+      "city": "Columbia",
+      "name": "Columbia Metropolitan Airport"
+    },
+    "CAK": {
+      "iata": "CAK",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 3600000,
+      "awarded_usd": 2792501,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "OH",
+      "city": "Akron",
+      "name": "Akron-Canton Regional Airport"
+    },
+    "CHA": {
+      "iata": "CHA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5000000,
+      "awarded_usd": 5000000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "TN",
+      "city": "Chattanooga",
+      "name": "Chattanooga Metropolitan Airport"
+    },
+    "CID": {
+      "iata": "CID",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 24015727,
+      "awarded_usd": 22750156,
+      "fiscal_years": [
+        2022,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "IA",
+      "city": "Cedar Rapids",
+      "name": "Eastern Iowa Airport"
+    },
+    "CKB": {
+      "iata": "CKB",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 15000000,
+      "awarded_usd": 15000000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "WV",
+      "city": "Clarksburg",
+      "name": "North Central West Virginia Airport"
+    },
+    "CLE": {
+      "iata": "CLE",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 6400000,
+      "awarded_usd": 4579200,
+      "fiscal_years": [
+        2023,
+        2024
+      ],
+      "first_year": 2023,
+      "state": "OH",
+      "city": "Cleveland",
+      "name": "Cleveland Hopkins International Airport"
+    },
+    "CLT": {
+      "iata": "CLT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 74000000,
+      "awarded_usd": 74312000,
+      "fiscal_years": [
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "NC",
+      "city": "Charlotte",
+      "name": "Charlotte Douglas International Airport"
+    },
+    "CMH": {
+      "iata": "CMH",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 8500000,
+      "awarded_usd": 8500000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "OH",
+      "city": "Columbus",
+      "name": "John Glenn Columbus International Airport"
+    },
+    "COS": {
+      "iata": "COS",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 20000000,
+      "awarded_usd": 20000000,
+      "fiscal_years": [
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "CO",
+      "city": "Colorado Springs",
+      "name": "Colorado Springs Airport"
+    },
+    "CPS": {
+      "iata": "CPS",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 450000,
+      "awarded_usd": 391375,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "IL",
+      "city": "Cahokia/St Louis",
+      "name": "Saint Louis Downtown Airport"
+    },
+    "CQF": {
+      "iata": "CQF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 2000000,
+      "awarded_usd": 1794206,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "AL",
+      "city": "Fairhope",
+      "name": "H.L. \"Sonny\" Callahan Airport"
+    },
+    "CRP": {
+      "iata": "CRP",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1800000,
+      "awarded_usd": 1816194,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "TX",
+      "city": "Corpus Christi",
+      "name": "Corpus Christi International Airport"
+    },
+    "CRW": {
+      "iata": "CRW",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 9000000,
+      "awarded_usd": 8990000,
+      "fiscal_years": [
+        2023,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "WV",
+      "city": "Charleston",
+      "name": "West Virginia International Yeager Airport"
+    },
+    "CSV": {
+      "iata": "CSV",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 475000,
+      "awarded_usd": 475000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "TN",
+      "city": "Crossville",
+      "name": "Crossville Memorial Airport - Whitson Field"
+    },
+    "CVG": {
+      "iata": "CVG",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 14000000,
+      "awarded_usd": 14000000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "KY",
+      "city": "Hebron",
+      "name": "Cincinnati/Northern Kentucky International Airport"
+    },
+    "CVN": {
+      "iata": "CVN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 3500000,
+      "awarded_usd": 3500000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "NM",
+      "city": "Clovis",
+      "name": "Clovis Regional Airport"
+    },
+    "CWF": {
+      "iata": "CWF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 500000,
+      "awarded_usd": 468133,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "LA",
+      "city": "Lake Charles",
+      "name": "Chennault International Airport"
+    },
+    "DAL": {
+      "iata": "DAL",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 13000000,
+      "awarded_usd": 0,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "TX",
+      "city": "Dallas",
+      "name": "Dallas Love Field Airport"
+    },
+    "DAY": {
+      "iata": "DAY",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 2900000,
+      "awarded_usd": 2900000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "OH",
+      "city": "Dayton",
+      "name": "James M. Cox Dayton International Airport"
+    },
+    "DBQ": {
+      "iata": "DBQ",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1346112,
+      "awarded_usd": 1346112,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "IA",
+      "city": "Dubuque",
+      "name": "Dubuque Regional Airport"
+    },
+    "DDC": {
+      "iata": "DDC",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 7300000,
+      "awarded_usd": 7300000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "KS",
+      "city": "Dodge City",
+      "name": "Dodge City Regional Airport"
+    },
+    "DEN": {
+      "iata": "DEN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 123600000,
+      "awarded_usd": 64600000,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "CO",
+      "city": "Denver",
+      "name": "Denver International Airport"
+    },
+    "DFW": {
+      "iata": "DFW",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 5,
+      "announced_usd": 96000000,
+      "awarded_usd": 81990000,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "TX",
+      "city": "Dallas-Fort Worth",
+      "name": "Dallas Fort Worth International Airport"
+    },
+    "DLH": {
+      "iata": "DLH",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 11000000,
+      "awarded_usd": 1807499,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "MN",
+      "city": "Duluth",
+      "name": "Duluth International Airport"
+    },
+    "DRO": {
+      "iata": "DRO",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 3200000,
+      "awarded_usd": 3200000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "CO",
+      "city": "Durango",
+      "name": "Durango-La Plata County Airport"
+    },
+    "DSM": {
+      "iata": "DSM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 24757143,
+      "awarded_usd": 14119931,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "IA",
+      "city": "Des Moines",
+      "name": "Des Moines International Airport"
+    },
+    "DTW": {
+      "iata": "DTW",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 5,
+      "announced_usd": 72400000,
+      "awarded_usd": 66587895,
+      "fiscal_years": [
+        2022,
+        2023,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "MI",
+      "city": "Detroit",
+      "name": "Detroit Metropolitan Airport"
+    },
+    "DYA": {
+      "iata": "DYA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1260000,
+      "awarded_usd": 1004991,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "AL",
+      "city": "Demopolis",
+      "name": "Demopolis Regional Airport"
+    },
+    "DYT": {
+      "iata": "DYT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1187000,
+      "awarded_usd": 1187000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "MN",
+      "city": "Duluth",
+      "name": "Sky Harbor Airport"
+    },
+    "ECP": {
+      "iata": "ECP",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 10000000,
+      "awarded_usd": 10000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "FL",
+      "city": "Panama City",
+      "name": "Northwest Florida Beaches International Airport"
+    },
+    "EHR": {
+      "iata": "EHR",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 247950,
+      "awarded_usd": 219988,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "KY",
+      "city": "Henderson",
+      "name": "Henderson City-County Airport"
+    },
+    "EKX": {
+      "iata": "EKX",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 400000,
+      "awarded_usd": 400000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "KY",
+      "city": "Elizabethtown",
+      "name": "Addington Field Airport"
+    },
+    "ELP": {
+      "iata": "ELP",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5000000,
+      "awarded_usd": 5000000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "TX",
+      "city": "El Paso",
+      "name": "El Paso International Airport"
+    },
+    "EPM": {
+      "iata": "EPM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1124800,
+      "awarded_usd": 1124800,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "ME",
+      "city": "Eastport",
+      "name": "Eastport Municipal Airport"
+    },
+    "ESF": {
+      "iata": "ESF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1400000,
+      "awarded_usd": 1389850,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "LA",
+      "city": "Pineville",
+      "name": "Esler Regional Airport (ESF)"
+    },
+    "EUG": {
+      "iata": "EUG",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5000000,
+      "awarded_usd": 0,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "OR",
+      "city": "Eugene",
+      "name": "Eugene Airport - Mahlon Sweet Field"
+    },
+    "EVV": {
+      "iata": "EVV",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 3420000,
+      "awarded_usd": 3420000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "IN",
+      "city": "Evansville",
+      "name": "Evansville Regional Airport"
+    },
+    "EWN": {
+      "iata": "EWN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5000000,
+      "awarded_usd": 5000000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "NC",
+      "city": "New Bern",
+      "name": "Coastal Carolina Regional Airport"
+    },
+    "EYW": {
+      "iata": "EYW",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 15800000,
+      "awarded_usd": 15800000,
+      "fiscal_years": [
+        2023,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "FL",
+      "city": "Key West",
+      "name": "Key West International Airport"
+    },
+    "FAI": {
+      "iata": "FAI",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 2375000,
+      "awarded_usd": 2375000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "AK",
+      "city": "Fairbanks",
+      "name": "Fairbanks International Airport"
+    },
+    "FAR": {
+      "iata": "FAR",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 12000000,
+      "awarded_usd": 12000000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "ND",
+      "city": "Fargo",
+      "name": "Hector International Airport"
+    },
+    "FAT": {
+      "iata": "FAT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 13100000,
+      "awarded_usd": 13100000,
+      "fiscal_years": [
+        2023,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "CA",
+      "city": "Fresno",
+      "name": "Fresno Yosemite International Airport"
+    },
+    "FFC": {
+      "iata": "FFC",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1000000,
+      "awarded_usd": 782117,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "GA",
+      "city": "Atlanta",
+      "name": "Atlanta Regional Airport - Falcon Field"
+    },
+    "FFT": {
+      "iata": "FFT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1000000,
+      "awarded_usd": 1000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "KY",
+      "city": "Frankfort",
+      "name": "Capital City Airport"
+    },
+    "FKA": {
+      "iata": "FKA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 950000,
+      "awarded_usd": 947181,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "MN",
+      "city": "Preston",
+      "name": "Fillmore County Airport"
+    },
+    "FLL": {
+      "iata": "FLL",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 66000000,
+      "awarded_usd": 66000000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "FL",
+      "city": "Fort Lauderdale",
+      "name": "Fort Lauderdale-Hollywood International Airport"
+    },
+    "FNT": {
+      "iata": "FNT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 3500000,
+      "awarded_usd": 3500000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "MI",
+      "city": "Flint",
+      "name": "Bishop International Airport"
+    },
+    "FOE": {
+      "iata": "FOE",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1900000,
+      "awarded_usd": 1549516,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "KS",
+      "city": "Topeka",
+      "name": "Topeka Regional Airport"
+    },
+    "FOK": {
+      "iata": "FOK",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 5900000,
+      "awarded_usd": 5900000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "NY",
+      "city": "Westhampton Beach",
+      "name": "Francis S. Gabreski Airport"
+    },
+    "FSD": {
+      "iata": "FSD",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 8000000,
+      "awarded_usd": 8000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "SD",
+      "city": "Sioux Falls",
+      "name": "Sioux Falls Regional Airport"
+    },
+    "FWA": {
+      "iata": "FWA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 21800000,
+      "awarded_usd": 22790000,
+      "fiscal_years": [
+        2022,
+        2023
+      ],
+      "first_year": 2022,
+      "state": "IN",
+      "city": "Fort Wayne",
+      "name": "Fort Wayne International Airport"
+    },
+    "GAO": {
+      "iata": "GAO",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1500000,
+      "awarded_usd": 1500000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "LA",
+      "city": "Galliano",
+      "name": "South Lafourche Leonard Miller, Jr. Airport"
+    },
+    "GAS": {
+      "iata": "GAS",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1900000,
+      "awarded_usd": 1769702,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "OH",
+      "city": "Gallipolis",
+      "name": "Gallia-Meigs Regional Airport"
+    },
+    "GEG": {
+      "iata": "GEG",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 30000000,
+      "awarded_usd": 28990000,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "WA",
+      "city": "Spokane",
+      "name": "Spokane International Airport"
+    },
+    "GKY": {
+      "iata": "GKY",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 540000,
+      "awarded_usd": 246165,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "TX",
+      "city": "Arlington",
+      "name": "Arlington Municipal Airport"
+    },
+    "GLY": {
+      "iata": "GLY",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1691437,
+      "awarded_usd": 1691437,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "MO",
+      "city": "Clinton",
+      "name": "Clinton Regional Airport"
+    },
+    "GNV": {
+      "iata": "GNV",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 4677250,
+      "awarded_usd": 4677250,
+      "fiscal_years": [
+        2022,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "FL",
+      "city": "Gainesville",
+      "name": "Gainesville Regional Airport"
+    },
+    "GPI": {
+      "iata": "GPI",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 12600000,
+      "awarded_usd": 9800000,
+      "fiscal_years": [
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "MT",
+      "city": "Kalispell",
+      "name": "Glacier Park International Airport"
+    },
+    "GPT": {
+      "iata": "GPT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1000000,
+      "awarded_usd": 1000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "MS",
+      "city": "Gulfport",
+      "name": "Gulfport-Biloxi International Airport"
+    },
+    "GRK": {
+      "iata": "GRK",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5000000,
+      "awarded_usd": 5000000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "TX",
+      "city": "Killeen",
+      "name": "Killeen-Fort Hood Regional Airport"
+    },
+    "GRO": {
+      "iata": "GRO",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 4500000,
+      "awarded_usd": 4500000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "MP",
+      "city": "Rota Island",
+      "name": "Rota International Airport"
+    },
+    "GRR": {
+      "iata": "GRR",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 15687870,
+      "awarded_usd": 14754693,
+      "fiscal_years": [
+        2022,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "MI",
+      "city": "Grand Rapids",
+      "name": "Gerald R Ford International Airport"
+    },
+    "GSN": {
+      "iata": "GSN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1900000,
+      "awarded_usd": 1800000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "MP",
+      "city": "Saipan",
+      "name": "Francisco C. Ada/Saipan International Airport"
+    },
+    "GSP": {
+      "iata": "GSP",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 7500000,
+      "awarded_usd": 0,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "SC",
+      "city": "Greer",
+      "name": "Greenville-Spartanburg International Airport"
+    },
+    "GTR": {
+      "iata": "GTR",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 11352358,
+      "awarded_usd": 11352358,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "MS",
+      "city": "Columbus/W Point/Starkville",
+      "name": "Golden Triangle Regional Airport"
+    },
+    "GUM": {
+      "iata": "GUM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 30400000,
+      "awarded_usd": 30400000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "GU",
+      "city": "Guam",
+      "name": "Antonio B. Won Pat International Airport, Guam"
+    },
+    "GUP": {
+      "iata": "GUP",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 730000,
+      "awarded_usd": 730000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "NM",
+      "city": "Gallup",
+      "name": "Gallup Municipal Airport"
+    },
+    "GYL": {
+      "iata": "GYL",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 712500,
+      "awarded_usd": 712500,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "MN",
+      "city": "Glencoe",
+      "name": "Glencoe Municipal Airport"
+    },
+    "HAE": {
+      "iata": "HAE",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 285000,
+      "awarded_usd": 285000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "MO",
+      "city": "Hannibal",
+      "name": "Hannibal Regional Airport"
+    },
+    "HGR": {
+      "iata": "HGR",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5250000,
+      "awarded_usd": 4346211,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "MD",
+      "city": "Hagerstown",
+      "name": "Hagerstown Regional Airport"
+    },
+    "HNB": {
+      "iata": "HNB",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 3300000,
+      "awarded_usd": 3365500,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "IN",
+      "city": "Huntingburg",
+      "name": "Huntingburg Regional Airport"
+    },
+    "HNL": {
+      "iata": "HNL",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 49012749,
+      "awarded_usd": 46762420,
+      "fiscal_years": [
+        2022,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "HI",
+      "city": "Honolulu",
+      "name": "Daniel K. Inouye International Airport"
+    },
+    "HOT": {
+      "iata": "HOT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1400000,
+      "awarded_usd": 881086,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "AR",
+      "city": "Hot Springs",
+      "name": "Hot Springs Memorial Field Airport"
+    },
+    "HOU": {
+      "iata": "HOU",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 3600000,
+      "awarded_usd": 4590000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "TX",
+      "city": "Houston",
+      "name": "William P. Hobby Airport"
+    },
+    "HRL": {
+      "iata": "HRL",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 9500000,
+      "awarded_usd": 10175000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "TX",
+      "city": "Harlingen",
+      "name": "Valley International Airport"
+    },
+    "HRO": {
+      "iata": "HRO",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 7000000,
+      "awarded_usd": 6419098,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "AR",
+      "city": "Harrison",
+      "name": "Boone County Regional Airport"
+    },
+    "HSV": {
+      "iata": "HSV",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 17000000,
+      "awarded_usd": 17000000,
+      "fiscal_years": [
+        2022,
+        2024
+      ],
+      "first_year": 2022,
+      "state": "AL",
+      "city": "Huntsville",
+      "name": "Huntsville Intl-Carl T Jones Fld"
+    },
+    "HVN": {
+      "iata": "HVN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 6500000,
+      "awarded_usd": 2500000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "CT",
+      "city": "New Haven",
+      "name": "Tweed New Haven Airport"
+    },
+    "HXD": {
+      "iata": "HXD",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5000000,
+      "awarded_usd": 5000000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "SC",
+      "city": "Hilton Head Island",
+      "name": "Hilton Head Island Airport"
+    },
+    "IAD": {
+      "iata": "IAD",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 144600000,
+      "awarded_usd": 145590000,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "VA",
+      "city": "Dulles",
+      "name": "Washington Dulles International Airport"
+    },
+    "IAH": {
+      "iata": "IAH",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 64690000,
+      "awarded_usd": 56080000,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "TX",
+      "city": "Houston",
+      "name": "George Bush Intercontinental Airport"
+    },
+    "ICT": {
+      "iata": "ICT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 3800000,
+      "awarded_usd": 4205976,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "KS",
+      "city": "Wichita",
+      "name": "Wichita Dwight D. Eisenhower National Airport"
+    },
+    "IDA": {
+      "iata": "IDA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 7700000,
+      "awarded_usd": 2500000,
+      "fiscal_years": [
+        2023,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "ID",
+      "city": "Idaho Falls",
+      "name": "Idaho Falls Regional Airport"
+    },
+    "ILE": {
+      "iata": "ILE",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1500000,
+      "awarded_usd": 1500000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "TX",
+      "city": "Killeen",
+      "name": "Skylark Field Airport"
+    },
+    "ILG": {
+      "iata": "ILG",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5600000,
+      "awarded_usd": 6324992,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "DE",
+      "city": "Wilmington",
+      "name": "Wilmington - New Castle Airport"
+    },
+    "ILM": {
+      "iata": "ILM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 4000000,
+      "awarded_usd": 4000000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "NC",
+      "city": "Wilmington",
+      "name": "New Hanover County Airport Authority dba Wilmington International Airport"
+    },
+    "IOB": {
+      "iata": "IOB",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1000000,
+      "awarded_usd": 1000000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "KY",
+      "city": "Mount Sterling",
+      "name": "Mount Sterling-Montgomery County Airport"
+    },
+    "IRK": {
+      "iata": "IRK",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 3200000,
+      "awarded_usd": 1809542,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "MO",
+      "city": "Kirksville",
+      "name": "Kirksville Regional Airport"
+    },
+    "ISP": {
+      "iata": "ISP",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 14110000,
+      "awarded_usd": 12930168,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "NY",
+      "city": "New York",
+      "name": "Long Island MacArthur Airport"
+    },
+    "IWA": {
+      "iata": "IWA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 14400000,
+      "awarded_usd": 14400000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "AZ",
+      "city": "Phoenix",
+      "name": "Phoenix-Mesa Gateway Airport"
+    },
+    "JAC": {
+      "iata": "JAC",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 8000000,
+      "awarded_usd": 8000000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "WY",
+      "city": "Jackson",
+      "name": "Jackson Hole"
+    },
+    "JAN": {
+      "iata": "JAN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 8000000,
+      "awarded_usd": 8000000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "MS",
+      "city": "Jackson",
+      "name": "Jackson-Medgar Wiley Evers International Airport"
+    },
+    "JKA": {
+      "iata": "JKA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5000000,
+      "awarded_usd": 5000000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "AL",
+      "city": "Gulf Shores",
+      "name": "Gulf Shores International Airport - Jack Edwards Field"
+    },
+    "JLN": {
+      "iata": "JLN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1660000,
+      "awarded_usd": 1660000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "MO",
+      "city": "Joplin",
+      "name": "Joplin Regional Airport"
+    },
+    "JYM": {
+      "iata": "JYM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 2500000,
+      "awarded_usd": 2500000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "MI",
+      "city": "Hillsdale",
+      "name": "Hillsdale Municipal Airport"
+    },
+    "KOA": {
+      "iata": "KOA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1200000,
+      "awarded_usd": 1200000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "HI",
+      "city": "Kailua Kona",
+      "name": "Ellison Onizuka Kona International Airport at Keahole"
+    },
+    "KTN": {
+      "iata": "KTN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 3000000,
+      "awarded_usd": 3000000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "AK",
+      "city": "Ketchikan",
+      "name": "Ketchikan International Airport"
+    },
+    "LAF": {
+      "iata": "LAF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1500000,
+      "awarded_usd": 1500000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "IN",
+      "city": "Lafayette",
+      "name": "Purdue University Airport"
+    },
+    "LAS": {
+      "iata": "LAS",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 31000000,
+      "awarded_usd": 31000000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "NV",
+      "city": "Las Vegas",
+      "name": "Harry Reid International Airport"
+    },
+    "LAW": {
+      "iata": "LAW",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 4379131,
+      "awarded_usd": 4379131,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "OK",
+      "city": "Lawton",
+      "name": "Lawton-Fort Sill Regional Airport"
+    },
+    "LAX": {
+      "iata": "LAX",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 92000000,
+      "awarded_usd": 111000000,
+      "fiscal_years": [
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "CA",
+      "city": "Los Angeles",
+      "name": "Los Angeles International"
+    },
+    "LBB": {
+      "iata": "LBB",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 10450000,
+      "awarded_usd": 10044745,
+      "fiscal_years": [
+        2023,
+        2024
+      ],
+      "first_year": 2023,
+      "state": "TX",
+      "city": "Lubbock",
+      "name": "Lubbock Preston Smith International Airport"
+    },
+    "LBF": {
+      "iata": "LBF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 7041832,
+      "awarded_usd": 8041037,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "NE",
+      "city": "North Platte",
+      "name": "North Platte Regional Airport"
+    },
+    "LCH": {
+      "iata": "LCH",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 2500000,
+      "awarded_usd": 2500000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "LA",
+      "city": "Lake Charles",
+      "name": "Lake Charles Regional Airport"
+    },
+    "LEX": {
+      "iata": "LEX",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 5000000,
+      "awarded_usd": 5000000,
+      "fiscal_years": [
+        2023,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "KY",
+      "city": "Lexington",
+      "name": "BLUE GRASS AIRPORT"
+    },
+    "LGB": {
+      "iata": "LGB",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 10600000,
+      "awarded_usd": 10592941,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "CA",
+      "city": "Long Beach",
+      "name": "Long Beach Airport"
+    },
+    "LIT": {
+      "iata": "LIT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 8000000,
+      "awarded_usd": 8000000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "AR",
+      "city": "Little Rock",
+      "name": "Bill and Hillary Clinton National Airport"
+    },
+    "LKR": {
+      "iata": "LKR",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 3000000,
+      "awarded_usd": 2292379,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "SC",
+      "city": "Lancaster",
+      "name": "Lancaster County Airport - McWhirter Field"
+    },
+    "LNK": {
+      "iata": "LNK",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 850000,
+      "awarded_usd": 414960,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "NE",
+      "city": "Lincoln",
+      "name": "Lincoln Airport"
+    },
+    "LNN": {
+      "iata": "LNN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 2600000,
+      "awarded_usd": 2600000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "OH",
+      "city": "Willoughby",
+      "name": "Lake County Executive Airport"
+    },
+    "LNS": {
+      "iata": "LNS",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 2700000,
+      "awarded_usd": 0,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "PA",
+      "city": "Lancaster",
+      "name": "Lancaster Airport"
+    },
+    "LRD": {
+      "iata": "LRD",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 2500000,
+      "awarded_usd": 0,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "TX",
+      "city": "Laredo",
+      "name": "Laredo International Airport"
+    },
+    "LWC": {
+      "iata": "LWC",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1075124,
+      "awarded_usd": 1075124,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "KS",
+      "city": "Lawrence",
+      "name": "Lawrence Regional Airport"
+    },
+    "LXT": {
+      "iata": "LXT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 5345534,
+      "awarded_usd": 5203223,
+      "fiscal_years": [
+        2023,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "MO",
+      "city": "Lee's Summit",
+      "name": "Lee's Summit Municipal Airport"
+    },
+    "MAF": {
+      "iata": "MAF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 10800000,
+      "awarded_usd": 10797336,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "TX",
+      "city": "Midland",
+      "name": "Midland International Air & Space Port"
+    },
+    "MCO": {
+      "iata": "MCO",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 124000000,
+      "awarded_usd": 124990000,
+      "fiscal_years": [
+        2022,
+        2023,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "FL",
+      "city": "Orlando",
+      "name": "Orlando International Airport"
+    },
+    "MCW": {
+      "iata": "MCW",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1215000,
+      "awarded_usd": 1215000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "IA",
+      "city": "Clear Lake",
+      "name": "Mason City Municipal Airport"
+    },
+    "MDH": {
+      "iata": "MDH",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1039404,
+      "awarded_usd": 1039404,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "IL",
+      "city": "Carbondale/Murphysboro",
+      "name": "Southern Illinois Airport Authority"
+    },
+    "MDT": {
+      "iata": "MDT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 16088114,
+      "awarded_usd": 16894636,
+      "fiscal_years": [
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "PA",
+      "city": "Harrisburg",
+      "name": "Harrisburg International Airport"
+    },
+    "MEB": {
+      "iata": "MEB",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1000000,
+      "awarded_usd": 1000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "NC",
+      "city": "Maxton",
+      "name": "Laurinburg-Maxton Airport"
+    },
+    "MEI": {
+      "iata": "MEI",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 9500000,
+      "awarded_usd": 2000000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "MS",
+      "city": "Meridian",
+      "name": "Meridian Regional Airport (Key Field)"
+    },
+    "MEM": {
+      "iata": "MEM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 17800000,
+      "awarded_usd": 17800000,
+      "fiscal_years": [
+        2023,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "TN",
+      "city": "Memphis",
+      "name": "Memphis International Airport"
+    },
+    "MFE": {
+      "iata": "MFE",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1980000,
+      "awarded_usd": 1980000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "TX",
+      "city": "McAllen",
+      "name": "McAllen International Airport"
+    },
+    "MGM": {
+      "iata": "MGM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5000000,
+      "awarded_usd": 5000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "AL",
+      "city": "Montgomery",
+      "name": "Montgomery Regional Airport"
+    },
+    "MHT": {
+      "iata": "MHT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 4116190,
+      "awarded_usd": 2821120,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "NH",
+      "city": "Manchester",
+      "name": "Manchester-Boston Regional Airport"
+    },
+    "MIA": {
+      "iata": "MIA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 62000000,
+      "awarded_usd": 58560000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "FL",
+      "city": "Miami",
+      "name": "Miami International Airport"
+    },
+    "MKE": {
+      "iata": "MKE",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 13600000,
+      "awarded_usd": 18634396,
+      "fiscal_years": [
+        2023,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "WI",
+      "city": "Milwaukee",
+      "name": "General Mitchell International Airport"
+    },
+    "MKL": {
+      "iata": "MKL",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1000000,
+      "awarded_usd": 740314,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "TN",
+      "city": "Jackson",
+      "name": "McKellar-Sipes Regional Airport"
+    },
+    "MLB": {
+      "iata": "MLB",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5000000,
+      "awarded_usd": 5000000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "FL",
+      "city": "Melbourne",
+      "name": "Melbourne Orlando International Airport"
+    },
+    "MLU": {
+      "iata": "MLU",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 2500000,
+      "awarded_usd": 2609816,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "LA",
+      "city": "Monroe",
+      "name": "Monroe Regional Airport"
+    },
+    "MRY": {
+      "iata": "MRY",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 17200000,
+      "awarded_usd": 17310162,
+      "fiscal_years": [
+        2023,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "CA",
+      "city": "Monterey",
+      "name": "Monterey Peninsula Airport District"
+    },
+    "MSN": {
+      "iata": "MSN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 2600000,
+      "awarded_usd": 2600000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "WI",
+      "city": "Madison",
+      "name": "Dane County Regional Airport - Truax Field"
+    },
+    "MSO": {
+      "iata": "MSO",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 17000000,
+      "awarded_usd": 17000000,
+      "fiscal_years": [
+        2022,
+        2024
+      ],
+      "first_year": 2022,
+      "state": "MT",
+      "city": "Missoula",
+      "name": "Missoula Montana Airport"
+    },
+    "MSP": {
+      "iata": "MSP",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 6,
+      "announced_usd": 71300000,
+      "awarded_usd": 53860120,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "MN",
+      "city": "Minneapolis",
+      "name": "Minneapolis-St. Paul International Airport"
+    },
+    "MSY": {
+      "iata": "MSY",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 25800000,
+      "awarded_usd": 26225307,
+      "fiscal_years": [
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "LA",
+      "city": "Kenner",
+      "name": "Louis Armstrong New Orleans International Airport"
+    },
+    "MTN": {
+      "iata": "MTN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 6400000,
+      "awarded_usd": 6400000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "MD",
+      "city": "Baltimore",
+      "name": "Martin State Airport"
+    },
+    "MVY": {
+      "iata": "MVY",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 15000000,
+      "awarded_usd": 15000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "MA",
+      "city": "Vineyard Haven",
+      "name": "Martha's Vineyard Airport"
+    },
+    "MYR": {
+      "iata": "MYR",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 10000000,
+      "awarded_usd": 10000000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "SC",
+      "city": "Myrtle Beach",
+      "name": "Myrtle Beach International Airport"
+    },
+    "NYL": {
+      "iata": "NYL",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 2050000,
+      "awarded_usd": 1957086,
+      "fiscal_years": [
+        2023,
+        2024
+      ],
+      "first_year": 2023,
+      "state": "AZ",
+      "city": "Yuma",
+      "name": "Yuma International Airport"
+    },
+    "OAK": {
+      "iata": "OAK",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 10000000,
+      "awarded_usd": 10000000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "CA",
+      "city": "Oakland",
+      "name": "Metropolitan Oakland International Airport"
+    },
+    "OGG": {
+      "iata": "OGG",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 8600000,
+      "awarded_usd": 8600000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "HI",
+      "city": "Kahului",
+      "name": "Kahului Airport"
+    },
+    "OKC": {
+      "iata": "OKC",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 8400000,
+      "awarded_usd": 3900000,
+      "fiscal_years": [
+        2022,
+        2023,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "OK",
+      "city": "Oklahoma City",
+      "name": "Will Rogers World Airport"
+    },
+    "OMA": {
+      "iata": "OMA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 36140251,
+      "awarded_usd": 37326251,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "NE",
+      "city": "Omaha",
+      "name": "Eppley Airfield"
+    },
+    "ONT": {
+      "iata": "ONT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 7072000,
+      "awarded_usd": 6771120,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "CA",
+      "city": "Ontario",
+      "name": "Ontario International Airport"
+    },
+    "ORD": {
+      "iata": "ORD",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 110000000,
+      "awarded_usd": 110000000,
+      "fiscal_years": [
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "IL",
+      "city": "Chicago",
+      "name": "Chicago O'Hare International Airport"
+    },
+    "ORF": {
+      "iata": "ORF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 26116366,
+      "awarded_usd": 25403426,
+      "fiscal_years": [
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "VA",
+      "city": "Norfolk",
+      "name": "Norfolk International Airport"
+    },
+    "PBI": {
+      "iata": "PBI",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 17000000,
+      "awarded_usd": 16541831,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "FL",
+      "city": "West Palm Beach",
+      "name": "Palm Beach International Airport"
+    },
+    "PDX": {
+      "iata": "PDX",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 35614286,
+      "awarded_usd": 35614286,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "OR",
+      "city": "Portland",
+      "name": "Portland International Airport"
+    },
+    "PGD": {
+      "iata": "PGD",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 20000000,
+      "awarded_usd": 20000000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "FL",
+      "city": "Punta Gorda",
+      "name": "Punta Gorda Airport"
+    },
+    "PHL": {
+      "iata": "PHL",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 5,
+      "announced_usd": 101900000,
+      "awarded_usd": 101900000,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "PA",
+      "city": "Philadelphia",
+      "name": "Philadelphia International Airport"
+    },
+    "PHX": {
+      "iata": "PHX",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 71000000,
+      "awarded_usd": 71000000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "AZ",
+      "city": "Phoenix",
+      "name": "Phoenix Sky Harbor International Airport"
+    },
+    "PIA": {
+      "iata": "PIA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 42520000,
+      "awarded_usd": 43823007,
+      "fiscal_years": [
+        2022,
+        2023,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "IL",
+      "city": "Peoria",
+      "name": "General Wayne A. Downing Peoria International Airport"
+    },
+    "PIE": {
+      "iata": "PIE",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 6000000,
+      "awarded_usd": 6000000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "FL",
+      "city": "St Petersburg-Clearwater",
+      "name": "St. Pete-Clearwater International Airport"
+    },
+    "PIT": {
+      "iata": "PIT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 34800000,
+      "awarded_usd": 34790141,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "PA",
+      "city": "Pittsburgh",
+      "name": "Allegheny County Airport Authority"
+    },
+    "PNS": {
+      "iata": "PNS",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 4000000,
+      "awarded_usd": 4000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "FL",
+      "city": "Pensacola",
+      "name": "Pensacola International Airport"
+    },
+    "PQI": {
+      "iata": "PQI",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 6500000,
+      "awarded_usd": 3406131,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "ME",
+      "city": "Presque Isle",
+      "name": "Presque Isle International Airport"
+    },
+    "PSC": {
+      "iata": "PSC",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 4000000,
+      "awarded_usd": 4000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "WA",
+      "city": "Pasco",
+      "name": "TRI-CITIES AIRPORT"
+    },
+    "PSM": {
+      "iata": "PSM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 7000000,
+      "awarded_usd": 7000000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "NH",
+      "city": "Portsmouth",
+      "name": "Portsmouth International Airport at Pease"
+    },
+    "PSP": {
+      "iata": "PSP",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 6000000,
+      "awarded_usd": 6000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "CA",
+      "city": "Palm Springs",
+      "name": "Palm Springs International Airport"
+    },
+    "PUW": {
+      "iata": "PUW",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 18165000,
+      "awarded_usd": 18165000,
+      "fiscal_years": [
+        2022,
+        2023
+      ],
+      "first_year": 2022,
+      "state": "WA",
+      "city": "Pullman",
+      "name": "Pullman-Moscow Regional Airport"
+    },
+    "PVD": {
+      "iata": "PVD",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 10000000,
+      "awarded_usd": 10000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "RI",
+      "city": "Providence",
+      "name": "Rhode Island T.F. Green International Airport"
+    },
+    "PVU": {
+      "iata": "PVU",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 4500000,
+      "awarded_usd": 4500000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "UT",
+      "city": "Provo",
+      "name": "Provo Municipal"
+    },
+    "PWC": {
+      "iata": "PWC",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1140000,
+      "awarded_usd": 1005358,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "MN",
+      "city": "Pine River",
+      "name": "Pine River Regional Airport"
+    },
+    "PWM": {
+      "iata": "PWM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 10400000,
+      "awarded_usd": 10400000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "ME",
+      "city": "Portland",
+      "name": "Portland International Jetport"
+    },
+    "RAP": {
+      "iata": "RAP",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 10900000,
+      "awarded_usd": 11900000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "SD",
+      "city": "Rapid City",
+      "name": "Rapid City Regional Airport"
+    },
+    "RDM": {
+      "iata": "RDM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 7000000,
+      "awarded_usd": 7000000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "OR",
+      "city": "Redmond",
+      "name": "Redmond Municipal Airport"
+    },
+    "RDU": {
+      "iata": "RDU",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 24000000,
+      "awarded_usd": 24000000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "NC",
+      "city": "Raleigh/Durham",
+      "name": "Raleigh-Durham International Airport"
+    },
+    "RIC": {
+      "iata": "RIC",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 6915000,
+      "awarded_usd": 6794763,
+      "fiscal_years": [
+        2022,
+        2023,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "VA",
+      "city": "Highland Springs",
+      "name": "Richmond International Airport"
+    },
+    "RKS": {
+      "iata": "RKS",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 7500000,
+      "awarded_usd": 7500000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "WY",
+      "city": "Rock Springs",
+      "name": "Southwest Wyoming Regional Airport"
+    },
+    "RME": {
+      "iata": "RME",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1750000,
+      "awarded_usd": 942249,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "NY",
+      "city": "Rome",
+      "name": "Griffiss International Airport"
+    },
+    "RNO": {
+      "iata": "RNO",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 10000000,
+      "awarded_usd": 3000000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "NV",
+      "city": "Reno",
+      "name": "Reno-Tahoe International Airport"
+    },
+    "ROC": {
+      "iata": "ROC",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5225000,
+      "awarded_usd": 3424386,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "NY",
+      "city": "Rochester",
+      "name": "Frederick Douglass - Greater Rochester International Airport"
+    },
+    "ROR": {
+      "iata": "ROR",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1690000,
+      "awarded_usd": 1690000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "PW",
+      "city": "Palau",
+      "name": "Palau International Airport"
+    },
+    "RSV": {
+      "iata": "RSV",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 3800000,
+      "awarded_usd": 3853192,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "IL",
+      "city": "Robinson",
+      "name": "Crawford County Airport"
+    },
+    "RSW": {
+      "iata": "RSW",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 18000000,
+      "awarded_usd": 18000000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "FL",
+      "city": "Fort Myers",
+      "name": "Southwest Florida International Airport"
+    },
+    "RUG": {
+      "iata": "RUG",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 500000,
+      "awarded_usd": 483597,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "ND",
+      "city": "Rugby",
+      "name": "Rugby Municipal Airport"
+    },
+    "SAN": {
+      "iata": "SAN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 56097251,
+      "awarded_usd": 13097251,
+      "fiscal_years": [
+        2022,
+        2023,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "CA",
+      "city": "San Diego",
+      "name": "San Diego International Airport"
+    },
+    "SAT": {
+      "iata": "SAT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 38000000,
+      "awarded_usd": 20708007,
+      "fiscal_years": [
+        2023,
+        2024
+      ],
+      "first_year": 2023,
+      "state": "TX",
+      "city": "San Antonio",
+      "name": "San Antonio International Airport"
+    },
+    "SAV": {
+      "iata": "SAV",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 11500000,
+      "awarded_usd": 11500000,
+      "fiscal_years": [
+        2023,
+        2024
+      ],
+      "first_year": 2023,
+      "state": "GA",
+      "city": "Savannah",
+      "name": "Savannah Airport Commission"
+    },
+    "SDF": {
+      "iata": "SDF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 15000000,
+      "awarded_usd": 15000000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "KY",
+      "city": "Louisville",
+      "name": "Louisville Muhammad Ali International Airport"
+    },
+    "SEA": {
+      "iata": "SEA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 4,
+      "announced_usd": 53900000,
+      "awarded_usd": 52151845,
+      "fiscal_years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "WA",
+      "city": "Seattle",
+      "name": "Seattle Tacoma International Airport"
+    },
+    "SFB": {
+      "iata": "SFB",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1000000,
+      "awarded_usd": 1000000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "FL",
+      "city": "Orlando",
+      "name": "Orlando Sanford International Airport"
+    },
+    "SFO": {
+      "iata": "SFO",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 62000000,
+      "awarded_usd": 56051370,
+      "fiscal_years": [
+        2023,
+        2024
+      ],
+      "first_year": 2023,
+      "state": "CA",
+      "city": "San Francisco",
+      "name": "San Franicsco International Airport"
+    },
+    "SGF": {
+      "iata": "SGF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5357143,
+      "awarded_usd": 5357143,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "MO",
+      "city": "Springfield",
+      "name": "Springfield-Branson National Airport"
+    },
+    "SHV": {
+      "iata": "SHV",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 9000000,
+      "awarded_usd": 10990000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "LA",
+      "city": "Shreveport",
+      "name": "Shreveport Regional Airport"
+    },
+    "SIT": {
+      "iata": "SIT",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 3151303,
+      "awarded_usd": 3151303,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "AK",
+      "city": "Sitka",
+      "name": "Sitka Rocky Gutierrez"
+    },
+    "SJC": {
+      "iata": "SJC",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 10000000,
+      "awarded_usd": 10990000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "CA",
+      "city": "San Jose",
+      "name": "Norman Y. Mineta San Jos\u00e9 International Airport"
+    },
+    "SJU": {
+      "iata": "SJU",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5000000,
+      "awarded_usd": 5000000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "PR",
+      "city": "San Juan",
+      "name": "Luis Mu\u00f1oz Mar\u00edn International Airport"
+    },
+    "SKF": {
+      "iata": "SKF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 5800000,
+      "awarded_usd": 3000000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "TX",
+      "city": "San Antonio",
+      "name": "Kelly Field Airport at Port San Antonio"
+    },
+    "SLC": {
+      "iata": "SLC",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 64000000,
+      "awarded_usd": 69425307,
+      "fiscal_years": [
+        2023,
+        2024,
+        2025
+      ],
+      "first_year": 2023,
+      "state": "UT",
+      "city": "Salt Lake City",
+      "name": "Salt Lake City International Airport"
+    },
+    "SLK": {
+      "iata": "SLK",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 500000,
+      "awarded_usd": 437609,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "NY",
+      "city": "Saranac Lake",
+      "name": "Adirondack Regional Airport"
+    },
+    "SLN": {
+      "iata": "SLN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 7041832,
+      "awarded_usd": 6419098,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "KS",
+      "city": "Salina",
+      "name": "Salina Regional Airport"
+    },
+    "SMF": {
+      "iata": "SMF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 11700000,
+      "awarded_usd": 0,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "CA",
+      "city": "Sacramento",
+      "name": "Sacramento International Airport"
+    },
+    "SNA": {
+      "iata": "SNA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 10600000,
+      "awarded_usd": 10600000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "CA",
+      "city": "Santa Ana",
+      "name": "John Wayne Airport, County of Orange"
+    },
+    "SPF": {
+      "iata": "SPF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1950000,
+      "awarded_usd": 1950000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "SD",
+      "city": "Spearfish",
+      "name": "Black Hills Airport - Clyde Ice Field"
+    },
+    "SRQ": {
+      "iata": "SRQ",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 3,
+      "announced_usd": 25000000,
+      "awarded_usd": 15000000,
+      "fiscal_years": [
+        2022,
+        2023,
+        2025
+      ],
+      "first_year": 2022,
+      "state": "FL",
+      "city": "Sarasota",
+      "name": "Sarasota Bradenton International Airport"
+    },
+    "STJ": {
+      "iata": "STJ",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 6480000,
+      "awarded_usd": 6480000,
+      "fiscal_years": [
+        2022,
+        2023
+      ],
+      "first_year": 2022,
+      "state": "MO",
+      "city": "St. Joseph",
+      "name": "Rosecrans Memorial Airport"
+    },
+    "STL": {
+      "iata": "STL",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 7008000,
+      "awarded_usd": 7008000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "MO",
+      "city": "St. Louis",
+      "name": "St. Louis Lambert International Airport"
+    },
+    "SUX": {
+      "iata": "SUX",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1564466,
+      "awarded_usd": 1564466,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "IA",
+      "city": "Sioux City",
+      "name": "Sioux Gateway Airport / City of Sioux City, Iowa"
+    },
+    "SWO": {
+      "iata": "SWO",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 4500000,
+      "awarded_usd": 4500000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "OK",
+      "city": "Stillwater",
+      "name": "Stillwater Regional Airport"
+    },
+    "SYR": {
+      "iata": "SYR",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 8600000,
+      "awarded_usd": 0,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "NY",
+      "city": "Syracuse",
+      "name": "Syracuse Regional Airport Authority"
+    },
+    "TIX": {
+      "iata": "TIX",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 2000000,
+      "awarded_usd": 2000000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "FL",
+      "city": "Titusville",
+      "name": "Space Coast Regional Airport"
+    },
+    "TOP": {
+      "iata": "TOP",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 3800000,
+      "awarded_usd": 3800000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "KS",
+      "city": "Topeka",
+      "name": "Philip Billard Municipal Airport"
+    },
+    "TPA": {
+      "iata": "TPA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 40000000,
+      "awarded_usd": 40000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "FL",
+      "city": "Tampa",
+      "name": "Tampa International Airport"
+    },
+    "TRI": {
+      "iata": "TRI",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 3765000,
+      "awarded_usd": 4242299,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "TN",
+      "city": "Bristol/Johnson/Kingsport",
+      "name": "Tri-Cities Airport Authority"
+    },
+    "TTN": {
+      "iata": "TTN",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 2500000,
+      "awarded_usd": 2500000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "NJ",
+      "city": "Trenton",
+      "name": "Trenton-Mercer Airport"
+    },
+    "TUL": {
+      "iata": "TUL",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 25500000,
+      "awarded_usd": 25500000,
+      "fiscal_years": [
+        2024,
+        2025
+      ],
+      "first_year": 2024,
+      "state": "OK",
+      "city": "Tulsa",
+      "name": "Tulsa International Airport"
+    },
+    "TVC": {
+      "iata": "TVC",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 5225000,
+      "awarded_usd": 5225000,
+      "fiscal_years": [
+        2023
+      ],
+      "first_year": 2023,
+      "state": "MI",
+      "city": "Traverse City",
+      "name": "Cherry Capital Airport"
+    },
+    "TVF": {
+      "iata": "TVF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1800000,
+      "awarded_usd": 1800000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "MN",
+      "city": "Thief River Falls",
+      "name": "Thief River Falls Regional Airport"
+    },
+    "TWM": {
+      "iata": "TWM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1140000,
+      "awarded_usd": 1140000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "MN",
+      "city": "Two Harbors",
+      "name": "Two Harbors Municipal Airport - Helgeson Field"
+    },
+    "TXK": {
+      "iata": "TXK",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 9275000,
+      "awarded_usd": 9271087,
+      "fiscal_years": [
+        2022,
+        2023
+      ],
+      "first_year": 2022,
+      "state": "AR",
+      "city": "Texarkana",
+      "name": "Texarkana Regional Airport"
+    },
+    "UKF": {
+      "iata": "UKF",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1500000,
+      "awarded_usd": 0,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "NC",
+      "city": "North Wilkesboro",
+      "name": "Wilkes County Airport"
+    },
+    "VES": {
+      "iata": "VES",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1350000,
+      "awarded_usd": 1350000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "OH",
+      "city": "Versailles",
+      "name": "Darke County Airport"
+    },
+    "VLD": {
+      "iata": "VLD",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 3000000,
+      "awarded_usd": 3000000,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "GA",
+      "city": "Valdosta",
+      "name": "Valdosta Regional Airport"
+    },
+    "VNC": {
+      "iata": "VNC",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 2,
+      "announced_usd": 1250000,
+      "awarded_usd": 1223812,
+      "fiscal_years": [
+        2023,
+        2024
+      ],
+      "first_year": 2023,
+      "state": "FL",
+      "city": "Venice",
+      "name": "Venice Municipal Airport"
+    },
+    "VTA": {
+      "iata": "VTA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 2385000,
+      "awarded_usd": 1847544,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "OH",
+      "city": "Newark",
+      "name": "Newark Heath Airport"
+    },
+    "WYS": {
+      "iata": "WYS",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 10000000,
+      "awarded_usd": 10000000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "MT",
+      "city": "West Yellowstone",
+      "name": "Yellowstone Airport"
+    },
+    "X60": {
+      "iata": "X60",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 500000,
+      "awarded_usd": 499872,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "FL",
+      "city": "Williston",
+      "name": "Williston Municipal Airport"
+    },
+    "XNA": {
+      "iata": "XNA",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 13000000,
+      "awarded_usd": 13000000,
+      "fiscal_years": [
+        2022
+      ],
+      "first_year": 2022,
+      "state": "AR",
+      "city": "Fayetteville/Springdale/Rogers",
+      "name": "Northwest Arkansas National Airport (XNA)"
+    },
+    "Y27": {
+      "iata": "Y27",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 700000,
+      "awarded_usd": 660250,
+      "fiscal_years": [
+        2024
+      ],
+      "first_year": 2024,
+      "state": "ND",
+      "city": "Fort Yates",
+      "name": "Standing Rock Airport"
+    },
+    "YKM": {
+      "iata": "YKM",
+      "funded": true,
+      "program": "ATP",
+      "grant_count": 1,
+      "announced_usd": 1000000,
+      "awarded_usd": 1000000,
+      "fiscal_years": [
+        2025
+      ],
+      "first_year": 2025,
+      "state": "WA",
+      "city": "Yakima",
+      "name": "Yakima Air Terminal/McAllister Field"
+    }
+  }
+}

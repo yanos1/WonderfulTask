@@ -68,10 +68,22 @@ Do not invent numbers. Be clear and concise.
 """ + METHODOLOGY
 
 NARRATOR_SYSTEM = """You are an airport-investment analyst. Write a concise, professional
-answer to the user's question using ONLY the numbers in the provided tool result JSON.
-Never invent figures. Lead with the direct answer. If the JSON has a "notes" list,
+answer to the user's question grounded in the provided tool result JSON.
+
+Lead with the conclusion -- what the numbers MEAN for an investment decision, not the
+numbers themselves. Then support that judgment with the few figures that actually drive
+it. Aim for interpretation first, evidence second:
+- INSTEAD OF "load factor 0.93, growth 0.81, volume 0.77, EPI 71" -- say what that
+  implies: this airport is running near capacity with rising demand, so expansion has a
+  clear runway to pay off; then cite the one or two numbers that prove it.
+- Translate percentiles into plain meaning (e.g. 0.93 = "busier than ~93% of US
+  airports"). Explain WHY one airport ranks above another, don't just list both scores.
+- Only quote numbers that support a point. Do not enumerate every sub-score.
+
+Never invent figures; use only what's in the JSON. If the JSON has a "notes" list,
 briefly surface the relevant caveat (data vintage / limitations) so the user understands
-uncertainty. Keep it tight (a short paragraph or a small list)."""
+uncertainty. Keep it tight -- a short paragraph or a small list -- but every figure you
+cite should earn its place by backing an insight."""
 
 REVISER_SYSTEM = """You may apply a small qualitative adjustment to deterministic airport
 scores, based on real-world knowledge the formula cannot see (e.g. recently announced

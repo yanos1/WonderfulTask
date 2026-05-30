@@ -106,9 +106,10 @@ with st.sidebar:
 
     lam = st.slider(
         "LLM influence (λ)", 0.0, 1.0, 0.0, 0.05,
-        help="How much the LLM may adjust deterministic scores. 0 = pure deterministic; "
+        help="How much the LLM may adjust deterministic scores, when calculating an investment score. 0 = pure deterministic; "
              "1 = ±30% max, and only with a written justification.",
     )
+
 
     # Dynamic explanation of what the current λ does to scoring.
     swing_pct = lam * MAX_SWING * 100
@@ -167,25 +168,54 @@ def render_result(result: dict):
     # top-right "⋮" → About menu rather than under every answer.
 
 
+# --------------------------------------------------------------------------- #
+# Turn handling — two phases so the input can be locked while we work:
+#   1. Submit: stash the question in `pending` and rerun.
+#   2. Busy rerun: the input renders disabled, then we answer synchronously.
+# This prevents spamming a second question on top of an in-flight one without
+# any background threads. (Streamlit's built-in top-right "running" indicator
+# still lets the user abort a genuinely stuck run.)
+# --------------------------------------------------------------------------- #
+st.session_state.setdefault("pending", None)
+
 # replay history
 for m in st.session_state.messages:
     with st.chat_message(m["role"]):
         st.markdown(m["content"])
+        if m.get("route"):
+            with st.expander("How I read your question (route)"):
+                st.json(m["route"])
         if m.get("result"):
             render_result(m["result"])
 
-# new turn
-if prompt := st.chat_input("Ask about US airport investment opportunities..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
+busy = st.session_state.pending is not None
+
+# Input is disabled while a question is in flight — prevents spamming a new one.
+if user_input := st.chat_input(
+    "Ask about US airport investment opportunities...", disabled=busy
+):
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    st.session_state.pending = user_input
+    st.rerun()
+
+# Answer the pending question. The input above is already rendered (disabled),
+# so it stays locked for the duration of this blocking call.
+if busy:
+    prompt = st.session_state.pending
     with st.chat_message("assistant"):
-        with st.spinner("Analyzing..."):
-            out = agent.ask(prompt)
-        st.markdown(out["answer"])
-        with st.expander("How I read your question (route)"):
-            st.json(out["route"])
-        render_result(out["result"])
-    st.session_state.messages.append(
-        {"role": "assistant", "content": out["answer"], "result": out["result"]}
-    )
+        with st.spinner("Analyzing…"):
+            try:
+                out = agent.ask(prompt)
+            except Exception as e:  # surface failures instead of hanging
+                out = None
+                st.session_state.messages.append(
+                    {"role": "assistant",
+                     "content": f"⚠️ Something went wrong while answering: {e}"}
+                )
+    if out is not None:
+        st.session_state.messages.append(
+            {"role": "assistant", "content": out["answer"],
+             "route": out["route"], "result": out["result"]}
+        )
+    st.session_state.pending = None
+    st.rerun()
