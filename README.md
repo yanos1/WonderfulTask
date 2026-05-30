@@ -16,8 +16,8 @@ It answers questions like:
 
 ```bash
 pip install -r requirements.txt
-python etl.py            # builds data/airports.json from public data (one-time; cached)
-streamlit run app.py     # open the chat UI
+python -m etl.build_airports   # builds data/airports.json from public data (one-time; cached)
+streamlit run app.py           # open the chat UI
 ```
 
 The app runs **without any API key** (deterministic routing + templated answers). For
@@ -45,15 +45,31 @@ You ─► Streamlit chat
    LLM NARRATE  ──► professional answer grounded in the numbers
 ```
 
-- **Data** (`etl.py` → `data/airports.json`): OurAirports (metadata, runways) + BTS T-100
-  2013 segment data (load factor, long-haul %) + FAA CY2024 enplanements (current volume +
-  YoY growth) + runway-based feasibility — derived for ~900 US airports.
-- **Scoring** (`scoring.py`): `EPI = demand × feasibility × 100`, percentile-normalized.
-- **Tools** (`tools.py`): pure-Python, the graded non-LLM logic.
-- **Agent** (`agent.py`): route → execute → revise → narrate, with conversation history
-  for follow-ups.
+- **Data** (`etl/build_airports.py` → `data/airports.json`): OurAirports (metadata, runways)
+  + BTS T-100 2013 segment data (load factor, long-haul %) + FAA CY2024 enplanements (current
+  volume + YoY growth) + runway-based feasibility — derived for ~900 US airports.
+- **Scoring** (`airport_intel/scoring.py`): `EPI = demand × feasibility × 100`, percentile-normalized.
+- **Tools** (`airport_intel/tools.py`): pure-Python, the graded non-LLM logic.
+- **Agent** (`airport_intel/agent.py`): route → execute → revise → narrate, with conversation
+  history for follow-ups.
 
 See **[DESIGN.md](DESIGN.md)** for the scoring methodology, tradeoffs, and where AI is used.
+
+## Project layout
+
+```
+app.py                       Streamlit entrypoint (run from the repo root)
+data/airports.json           derived dataset (built by the ETL)
+airport_intel/               core package — all runtime logic
+  agent.py                   orchestration: route → execute → revise → narrate
+  tools.py                   deterministic tools (rank / compare / profile / breakdown)
+  scoring.py                 EPI engine + bounded, λ-capped LLM modifier
+  repository.py              data-access layer (Repository interface; JSON-backed)
+  regions.py                 US region → state resolution
+  llm/                       swappable providers (Gemini | Claude) behind one primitive
+etl/build_airports.py        offline build pipeline (public data → data/airports.json)
+tests/                       scoring + resolution unit tests
+```
 
 ## Tests
 

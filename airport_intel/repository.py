@@ -11,7 +11,10 @@ import os
 from abc import ABC, abstractmethod
 from typing import Iterable, Optional
 
-DEFAULT_PATH = os.path.join(os.path.dirname(__file__), "data", "airports.json")
+# data/ lives at the repo root, one level above this package
+DEFAULT_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "data", "airports.json"
+)
 
 
 class Repository(ABC):

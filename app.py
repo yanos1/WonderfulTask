@@ -7,14 +7,26 @@ import os
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 from dotenv import load_dotenv
 
-from agent import Agent
-from llm import get_provider
+from airport_intel.agent import Agent
+from airport_intel.llm import get_provider
+from airport_intel.scoring import MAX_SWING
+from airport_intel.tools import DATA_NOTES
 
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
-st.set_page_config(page_title="Airport Investment Intelligence", page_icon="✈️", layout="wide")
+# Global methodology assumptions/caveats — shown once in the top-right "⋮" → About
+# menu instead of being repeated under every answer.
+_ASSUMPTIONS_MD = "### Assumptions & caveats\n\n" + "\n".join(f"- {n}" for n in DATA_NOTES)
+
+st.set_page_config(
+    page_title="Airport Investment Intelligence",
+    page_icon="✈️",
+    layout="wide",
+    menu_items={"About": _ASSUMPTIONS_MD},
+)
 st.title("✈️ Airport Investment Intelligence Agent")
 st.caption("Ranks US airports for renovation/expansion ROI using a deterministic Expansion "
            "Profitability Index, with an LLM for routing, explanation, and a bounded score nudge.")
@@ -44,6 +56,15 @@ with st.sidebar:
         help="How much the LLM may adjust deterministic scores. 0 = pure deterministic; "
              "1 = ±30% max, and only with a written justification.",
     )
+
+    # Dynamic explanation of what the current λ does to scoring.
+    swing_pct = lam * MAX_SWING * 100
+    if lam == 0.0:
+        st.caption("**λ = 0** → pure deterministic: the LLM can't move scores at all "
+                   "(modifier locked to 1.0).")
+    else:
+        st.caption(f"**λ = {lam:.2f}** → the LLM may nudge each score by at most "
+                   f"**±{swing_pct:.0f}%**, and only with a written justification.")
 
     provider = None
     if model_choice != "Deterministic (no LLM)":
@@ -87,10 +108,8 @@ def render_result(result: dict):
         with st.expander("Deterministic steps"):
             for s in result["steps"]:
                 st.markdown(f"- {s}")
-    if result.get("notes"):
-        with st.expander("Assumptions & caveats"):
-            for n in result["notes"]:
-                st.markdown(f"- {n}")
+    # Assumptions & caveats are global to the methodology, so they live once in the
+    # top-right "⋮" → About menu rather than under every answer.
 
 
 # replay history
@@ -115,3 +134,28 @@ if prompt := st.chat_input("Ask about US airport investment opportunities..."):
     st.session_state.messages.append(
         {"role": "assistant", "content": out["answer"], "result": out["result"]}
     )
+
+# Make "Clear cache" (c) and the dev "d" shortcut mouse-only: swallow the bare keys so
+# Streamlit's keyboard handlers never see them, while the top-right "⋮" menu still works.
+# Guarded so we don't interfere with typing or with Ctrl/Cmd combos (e.g. copy).
+components.html(
+    """
+    <script>
+    const doc = window.parent.document;
+    if (!doc.__shortcutGuardInstalled) {
+        doc.__shortcutGuardInstalled = true;
+        doc.addEventListener("keydown", function (e) {
+            const k = (e.key || "").toLowerCase();
+            if (k !== "c" && k !== "d") return;
+            if (e.ctrlKey || e.metaKey || e.altKey) return;   // leave copy/paste etc. alone
+            const el = doc.activeElement;
+            const tag = el ? el.tagName : "";
+            if (tag === "INPUT" || tag === "TEXTAREA" || (el && el.isContentEditable)) return;
+            e.stopImmediatePropagation();
+            e.preventDefault();
+        }, true);   // capture phase: run before Streamlit's own handler
+    }
+    </script>
+    """,
+    height=0,
+)

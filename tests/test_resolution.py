@@ -2,7 +2,7 @@
 
 import pytest
 
-from regions import resolve_region
+from airport_intel.regions import resolve_region
 
 
 def test_region_exact():
@@ -25,7 +25,7 @@ def test_unknown_region_is_none():
 
 
 # entity resolution touches the real dataset; skip cleanly if the ETL hasn't been run
-tools = pytest.importorskip("tools")
+tools = pytest.importorskip("airport_intel.tools")
 
 
 def _has_data():
@@ -35,7 +35,7 @@ def _has_data():
         return False
 
 
-@pytest.mark.skipif(not _has_data(), reason="airports.json not built (run etl.py)")
+@pytest.mark.skipif(not _has_data(), reason="airports.json not built (run python -m etl.build_airports)")
 def test_resolve_code_by_iata_and_name():
     assert tools.resolve_code("LAX") == "LAX"
     assert tools.resolve_code("Santa Ana") == "SNA"

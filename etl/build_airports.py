@@ -13,7 +13,7 @@ Sources (all public, keyless):
   - BTS T-100 Domestic Segment 2013 (dannguyen GitHub mirror) -> load factor, long-haul %
   - FAA CY2024 commercial-service enplanements -> current volume + YoY growth
 
-Run:  python etl.py            (full build -> airports.json)
+Run:  python -m etl.build_airports        (full build -> data/airports.json)
 """
 
 import json
@@ -28,7 +28,8 @@ warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
 # --------------------------------------------------------------------------- #
 # Config
 # --------------------------------------------------------------------------- #
-DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+# data/ lives at the repo root, one level above this etl/ package
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 RAW_DIR = os.path.join(DATA_DIR, "raw")
 OUT_PATH = os.path.join(DATA_DIR, "airports.json")
 

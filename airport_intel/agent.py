@@ -16,10 +16,10 @@ import json
 import re
 from typing import Optional
 
-import scoring
-import tools
-from llm import LLMProvider
-from regions import REGIONS, resolve_region
+from . import scoring
+from . import tools
+from .llm import LLMProvider
+from .regions import REGIONS, resolve_region
 
 # --------------------------------------------------------------------------- #
 # Prompts
@@ -36,6 +36,9 @@ Tools:
 - flight_breakdown(code): long-haul flight share for one airport. Use for "long haul %".
 - explain: the user asks HOW a score was computed, the methodology, or "why these
   numbers/scores" about a PREVIOUS answer. No args.
+- none: the message is a greeting, thanks, smalltalk, or NOT about US airport investment
+  (e.g. "hi", "how are you", "what's the capital of France"). Use this whenever no tool
+  clearly applies. NEVER force a ranking or any other tool onto a non-airport message.
 
 Given the conversation, output JSON ONLY:
 {"tool": "<tool name or 'none'>", "args": {...}, "assumptions": ["..."]}
@@ -78,6 +81,25 @@ For each airport you wish to adjust, return a modifier and a SPECIFIC factual re
 A modifier of 1.0 means no change. You MUST justify any modifier != 1.0; unjustified
 adjustments are discarded. Output JSON ONLY:
 {"modifiers": [{"iata": "SFO", "modifier": 1.08, "reason": "..."}]}"""
+
+HELP_SYSTEM = """You are the assistant for an Airport Investment Intelligence tool. The
+user's latest message is NOT a data request — it may be a greeting, a thank-you, or an
+off-topic question. Reply in 1-3 short, warm sentences: greet back if they greeted you,
+briefly explain that you help identify US airports where renovation or expansion is most
+likely to be profitable (based on passenger and flight capacity), and invite a relevant
+question. If the message is off-topic, gently steer back to airport investment. Do NOT
+invent any airport names, numbers, or scores. You may suggest one example, e.g. "Which
+airports in New England are strong candidates for expansion?\""""
+
+# deterministic fallback when no LLM is configured
+HELP_TEXT = (
+    "Hi! I help identify US airports where renovation or expansion is most likely to be "
+    "profitable, based on passenger and flight capacity. Try asking, for example:\n"
+    "  - Which airports in New England are strong candidates for terminal expansion?\n"
+    "  - Compare LA and Santa Ana airport congestion levels.\n"
+    "  - What is the percentage of long-haul flights out of Anchorage?\n"
+    "  - What is the unmet flight demand in SFO and why?"
+)
 
 
 # --------------------------------------------------------------------------- #
@@ -130,17 +152,41 @@ class Agent:
 
     def _fallback_route(self, msg: str) -> dict:
         low = msg.lower()
+        stripped = low.strip().strip("!?.,")
+        # greeting / thanks / smalltalk / off-topic -> friendly help, never a forced ranking
+        greetings = {"hi", "hello", "hey", "yo", "sup", "hiya", "thanks", "thank you",
+                     "help", "?", "ok", "okay"}
+        greeting_phrases = ("how are you", "how're you", "how are u", "how's it going",
+                            "hows it going", "how do you do", "good morning",
+                            "good afternoon", "good evening", "who are you",
+                            "what can you do", "what do you do")
+        if stripped in greetings or any(p in low for p in greeting_phrases):
+            return {"tool": "none", "args": {}}
         if (("how" in low or "why" in low or "explain" in low)
                 and ("score" in low or "epi" in low or "comput" in low or "reach" in low)):
             return {"tool": "explain", "args": {}}
+        # entity tools only fire when an actual airport is present; else fall through to help
         if "long haul" in low or "long-haul" in low:
-            return {"tool": "flight_breakdown", "args": {"code": self._guess_airport(msg)}}
+            code = self._guess_airport(msg)
+            if code:
+                return {"tool": "flight_breakdown", "args": {"code": code}}
         if " vs " in low or "compare" in low:
-            return {"tool": "compare_airports",
-                    "args": {"codes": self._guess_airports(msg), "metric": self._guess_metric(low)}}
+            codes = self._guess_airports(msg)
+            if codes:
+                return {"tool": "compare_airports",
+                        "args": {"codes": codes, "metric": self._guess_metric(low)}}
         if "unmet" in low or "profile" in low or "tell me about" in low or "why" in low:
-            return {"tool": "airport_profile", "args": {"code": self._guess_airport(msg)}}
-        return {"tool": "rank_region", "args": {"region": self._guess_region(low), "limit": 5}}
+            code = self._guess_airport(msg)
+            if code:
+                return {"tool": "airport_profile", "args": {"code": code}}
+        # rank only on a clear ranking/aviation signal (region or intent word); else help
+        region = self._guess_region(low)
+        rank_signals = ("rank", "top ", "best", "strong", "candidate", "expansion",
+                        "expand", "invest", "profitab", "opportunit", "which airport",
+                        "airports in", "terminal", "renovat")
+        if region or any(s in low for s in rank_signals):
+            return {"tool": "rank_region", "args": {"region": region, "limit": 5}}
+        return {"tool": "none", "args": {}}
 
     # -- naive entity guessers (only used when no LLM is configured) ------- #
     @staticmethod
@@ -152,27 +198,13 @@ class Agent:
 
     @staticmethod
     def _guess_airports(msg: str) -> list[str]:
-        codes = re.findall(r"\b[A-Z]{3}\b", msg)
-        if len(codes) >= 2:
-            return codes[:2]
-        # fall back to resolving notable tokens
-        found = []
-        for token in re.split(r"[,/]| vs | and ", msg, flags=re.IGNORECASE):
-            c = tools.resolve_code(token.strip())
-            if c and c not in found:
-                found.append(c)
-        return found[:2]
+        # codes / cities / names mentioned anywhere in the sentence, in order of appearance
+        return tools.find_in_text(msg, limit=2)
 
     @staticmethod
     def _guess_airport(msg: str) -> str:
-        codes = re.findall(r"\b[A-Z]{3}\b", msg)
-        if codes:
-            return codes[0]
-        for token in re.findall(r"[A-Za-z][A-Za-z ]+", msg):
-            c = tools.resolve_code(token.strip())
-            if c:
-                return c
-        return ""
+        found = tools.find_in_text(msg, limit=1)
+        return found[0] if found else ""
 
     @staticmethod
     def _guess_metric(low: str) -> str:
@@ -259,6 +291,17 @@ class Agent:
                          f"{r.get('feasibility')} × 100 = EPI {r.get('epi')}  (sub-scores: {subs})")
         return "\n".join(lines)
 
+    # -- help / smalltalk (greeting, thanks, or off-topic) ---------------- #
+    def _help(self, user_message: str) -> str:
+        if self.provider:
+            try:
+                return self.provider.complete(
+                    HELP_SYSTEM, [{"role": "user", "content": user_message}]
+                ).strip()
+            except Exception:
+                pass
+        return HELP_TEXT
+
     # -- public ----------------------------------------------------------- #
     def ask(self, user_message: str) -> dict:
         route = self._route(user_message)
@@ -271,9 +314,9 @@ class Agent:
         elif tool == "explain":
             result = {"intent": "explain"}
             answer = self._explain(user_message)
-        else:
-            result = {"intent": "none", "note": "No matching tool."}
-            answer = self._narrate(user_message, result)
+        else:  # tool == "none" / unrecognized -> greeting, thanks, or off-topic
+            result = {"intent": "smalltalk"}
+            answer = self._help(user_message)
         self.history.append({"role": "user", "content": user_message})
         self.history.append({"role": "assistant", "content": answer})
         return {"answer": answer, "route": route, "result": result}

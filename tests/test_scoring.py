@@ -1,7 +1,7 @@
 """Unit tests for the deterministic scoring engine and the bounded LLM modifier."""
 
-import scoring
-from scoring import ScoringEngine, apply_modifier, clamp_modifier, MAX_SWING
+from airport_intel import scoring
+from airport_intel.scoring import ScoringEngine, apply_modifier, clamp_modifier, MAX_SWING
 
 # synthetic universe with known ordering (no file/network dependency)
 AIRPORTS = [
