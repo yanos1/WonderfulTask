@@ -32,7 +32,7 @@ DEFAULT_WEIGHTS = {
 # How to pull each demand component's raw value from an airport record.
 _GETTERS = {
     "load_factor": lambda a: a.get("load_factor"),
-    "growth": lambda a: a.get("pax_growth_cagr"),
+    "growth": lambda a: a.get("pax_growth_yoy"),
     "delay": lambda a: a.get("avg_delay_min"),
     "volume": lambda a: a.get("passengers"),
 }
@@ -110,7 +110,7 @@ class ScoringEngine:
     def unmet_demand(self, airport: dict) -> dict:
         """Standalone indicator for the 'unmet demand in X and why' question (Q4)."""
         lf = self._pct["load_factor"].rank(airport.get("load_factor"))
-        gr = self._pct["growth"].rank(airport.get("pax_growth_cagr")) if "growth" in self._pct else None
+        gr = self._pct["growth"].rank(airport.get("pax_growth_yoy")) if "growth" in self._pct else None
         parts = [r for r in (lf, gr) if r is not None]
         score = round(100 * sum(parts) / len(parts), 1) if parts else None
         reasons = []
@@ -119,10 +119,10 @@ class ScoringEngine:
                 f"load factor {airport['load_factor']:.0%} "
                 f"({lf:.0%} percentile) - fuller planes imply demand turned away"
             )
-        if airport.get("pax_growth_cagr") is not None:
-            reasons.append(f"passenger growth {airport['pax_growth_cagr']:.1%}/yr")
+        if airport.get("pax_growth_yoy") is not None:
+            reasons.append(f"passenger growth {airport['pax_growth_yoy']:.1%} YoY (2024 vs 2023)")
         else:
-            reasons.append("growth unavailable (current-year data not wired)")
+            reasons.append("growth unavailable for this airport")
         return {"iata": airport["iata"], "unmet_demand_score": score, "reasons": reasons}
 
 

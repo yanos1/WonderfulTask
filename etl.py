@@ -1,7 +1,7 @@
 """ETL: build airports.json from public aviation data (no API keys required).
 
 Vintage strategy "B" (documented as an explicit assumption in DESIGN.md):
-  - Current volume + growth come from 2024 data.
+  - Current volume + YoY growth come from FAA CY2024 enplanements (2024 vs 2023).
   - Structural ratios (load factor, long-haul share) come from the 2013 T-100 segment
     file -- the most recent reliably/programmatically downloadable segment-level data
     (which uniquely carries SEATS and DISTANCE). Industry load factors have risen since
@@ -11,7 +11,7 @@ Vintage strategy "B" (documented as an explicit assumption in DESIGN.md):
 Sources (all public, keyless):
   - OurAirports airports.csv + runways.csv  -> metadata + runways (feasibility proxy)
   - BTS T-100 Domestic Segment 2013 (dannguyen GitHub mirror) -> load factor, long-haul %
-  - NTAD 2024 (BTS ArcGIS feature service) -> current passengers/departures + growth basis
+  - FAA CY2024 commercial-service enplanements -> current volume + YoY growth
 
 Run:  python etl.py            (full build -> airports.json)
 """
@@ -19,9 +19,11 @@ Run:  python etl.py            (full build -> airports.json)
 import json
 import os
 import urllib.request
-from collections import defaultdict
+import warnings
 
 import pandas as pd
+
+warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
 
 # --------------------------------------------------------------------------- #
 # Config
@@ -36,13 +38,14 @@ T100_2013 = (
     "https://raw.githubusercontent.com/dannguyen/bts-transstats-t100-domestic-demo/"
     "master/data/T_T100D_SEGMENT_US_CARRIER_ONLY_2013_All.csv"
 )
-NTAD_QUERY = (
-    "https://services.arcgis.com/xOi1kZaI0eWDREZv/ArcGIS/rest/services/"
-    "T100_Domestic_Market_and_Segment_Data/FeatureServer/1/query"
+FAA_ENPLANEMENTS = (
+    "https://www.faa.gov/airports/planning_capacity/passenger_allcargo_stats/"
+    "passenger/arp-cy2024-commercial-service-enplanements.xlsx"
 )
+FAA_UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}  # FAA blocks default agents
 
 BASE_YEAR = 2013          # vintage of the segment-level (seats/distance) data
-CURRENT_YEAR = 2024       # vintage of NTAD volume data
+CURRENT_YEAR = 2024       # vintage of FAA enplanement volume + growth
 LONG_HAUL_MILES = 2500    # a flight is "long haul" if its segment distance exceeds this
 # Service classes to KEEP (passenger service). Excludes all-cargo classes G and P,
 # honoring the "ignore cargo" scoping decision.
@@ -54,12 +57,15 @@ NAMED = ["SFO", "LAX", "SNA", "ANC", "BOS"]  # sanity-check airports from the br
 # --------------------------------------------------------------------------- #
 # Download helper (cache-aside: fetch once, reuse the local copy)
 # --------------------------------------------------------------------------- #
-def download(url: str, filename: str) -> str:
+def download(url: str, filename: str, headers: dict | None = None) -> str:
     os.makedirs(RAW_DIR, exist_ok=True)
     path = os.path.join(RAW_DIR, filename)
     if not os.path.exists(path):
         print(f"  downloading {filename} ...")
-        urllib.request.urlretrieve(url, path)
+        req = urllib.request.Request(url, headers=headers or {})
+        data = urllib.request.urlopen(req, timeout=120).read()
+        with open(path, "wb") as f:
+            f.write(data)
     else:
         print(f"  cached     {filename}")
     return path
@@ -122,97 +128,80 @@ def load_t100_2013():
         deps = r["departures_2013"]
         out[iata] = {
             "passengers_2013": float(r["passengers_2013"]),
+            "departures_2013": float(deps),
             "load_factor": round(float(r["passengers_2013"] / seats), 4) if seats > 0 else None,
             "long_haul_pct": round(float(r["lh_departures"] / deps), 4) if deps > 0 else None,
         }
     return out
 
 
-def load_ntad_2024():
-    """Page through the NTAD ArcGIS table -> 2024 passengers/departures by origin.
+def load_faa_enplanements():
+    """FAA CY2024 commercial-service enplanements by airport -> current volume + YoY growth.
 
-    This source is wired but currently unreliable (the hosted view rejects feature
-    queries). We attempt it, and on any failure return {} so the build degrades
-    gracefully to the historical baseline -- the vintage is recorded per airport and
-    surfaced to the user, rather than failing the whole pipeline.
+    On any failure return {} so the build degrades gracefully to the 2013 baseline (vintage
+    is recorded per airport and surfaced to the user) rather than failing the pipeline.
     """
-    out = defaultdict(lambda: {"passengers": 0.0, "departures": 0.0})
-    offset, batch = 0, 1000
     try:
-        while True:
-            url = (
-                f"{NTAD_QUERY}?where=year%3D{CURRENT_YEAR}"
-                "&outFields=origin,passengers,departures"
-                "&returnGeometry=false&f=json"
-                f"&resultOffset={offset}&resultRecordCount={batch}"
-            )
-            data = json.load(urllib.request.urlopen(url, timeout=30))
-            feats = data.get("features", [])
-            if not feats:
-                break
-            for f in feats:
-                a = f["attributes"]
-                code = str(a.get("origin", "")).upper()
-                if code:
-                    out[code]["passengers"] += float(a.get("passengers") or 0)
-                    out[code]["departures"] += float(a.get("departures") or 0)
-            if len(feats) < batch:
-                break
-            offset += batch
+        path = download(FAA_ENPLANEMENTS, "faa_cy2024_enplanements.xlsx", headers=FAA_UA)
+        df = pd.read_excel(path, header=0)
     except Exception as e:  # noqa: BLE001 - resilience by design
-        print(f"  NTAD unavailable ({type(e).__name__}); falling back to 2013 baseline")
-    result = {c: v for c, v in out.items() if v["passengers"] > 0}
-    if not result:
-        print("  NTAD returned no usable rows; volume falls back to 2013 baseline")
-    return result
+        print(f"  FAA enplanements unavailable ({type(e).__name__}); falling back to 2013 baseline")
+        return {}
+
+    out = {}
+    for _, r in df.iterrows():
+        code = str(r.get("Locid", "")).strip().upper()
+        enp = r.get("CY 24 Enplanements")
+        chg = r.get("% Change")
+        if not code or code == "NAN" or pd.isna(enp):
+            continue
+        out[code] = {
+            "enplanements": float(enp),
+            "growth": round(float(chg), 4) if pd.notna(chg) else None,
+        }
+    print(f"  FAA enplanements: {len(out)} airports (CY2024 vs CY2023 YoY)")
+    return out
 
 
 # --------------------------------------------------------------------------- #
 # Build
 # --------------------------------------------------------------------------- #
-def cagr(start: float, end: float, years: int):
-    if start and start > 0 and end and end > 0:
-        return round((end / start) ** (1 / years) - 1, 4)
-    return None
-
-
 def build():
     print("Loading OurAirports ...")
     meta, runways = load_ourairports()
     print("Loading BTS T-100 2013 segment ...")
     t13 = load_t100_2013()
-    print("Loading NTAD 2024 ...")
-    n24 = load_ntad_2024()
+    print("Loading FAA CY2024 enplanements ...")
+    faa = load_faa_enplanements()
 
-    # union of airports that have either current or historical passenger activity
-    codes = {c for c, v in n24.items() if v["passengers"] > 0} | set(t13.keys())
+    # union of airports with current (FAA) or historical (T-100) passenger activity
+    codes = set(faa.keys()) | set(t13.keys())
     airports = {}
     for iata in sorted(codes):
         if iata not in meta:
             continue  # need metadata (name/city/state) to be useful
-        cur = n24.get(iata, {"passengers": 0.0, "departures": 0.0})
+        cur = faa.get(iata)
         hist = t13.get(iata, {})
-        pax_2024 = cur["passengers"]
-        pax_2013 = hist.get("passengers_2013")
 
-        # Volume: prefer current (2024); fall back to the 2013 baseline and record vintage.
-        if pax_2024 > 0:
-            volume, vintage, departures = pax_2024, CURRENT_YEAR, round(cur["departures"])
+        # Volume + growth: prefer current FAA (2024); else fall back to 2013 baseline.
+        if cur and cur.get("enplanements"):
+            volume, vintage, growth = cur["enplanements"], CURRENT_YEAR, cur.get("growth")
         else:
-            volume, vintage, departures = (pax_2013 or 0), BASE_YEAR, None
+            volume, vintage, growth = (hist.get("passengers_2013") or 0), BASE_YEAR, None
 
+        deps = hist.get("departures_2013")
         airports[iata] = {
             "iata": iata,
             **meta[iata],
             # demand volume (with vintage so uncertainty is explicit downstream)
             "passengers": round(volume),
             "passengers_vintage": vintage,
-            "departures": departures,
+            "departures": round(deps) if deps else None,
             # structural ratios (2013)
             "load_factor": hist.get("load_factor"),
             "long_haul_pct": hist.get("long_haul_pct"),
-            # growth: long-run CAGR 2013 -> 2024 (None when current data is unavailable)
-            "pax_growth_cagr": cagr(pax_2013, pax_2024, CURRENT_YEAR - BASE_YEAR),
+            # growth: FAA CY2024 vs CY2023 YoY (None when current data is unavailable)
+            "pax_growth_yoy": growth,
             # feasibility inputs
             **runways.get(iata, {"runway_count": 0, "runway_length_ft": 0.0}),
         }
@@ -231,7 +220,7 @@ def build():
             continue
         print(
             f"  {code:5} {a['passengers']:>12,} {a['passengers_vintage']:>5} {str(a['load_factor']):>6} "
-            f"{str(a['long_haul_pct']):>8} {str(a['pax_growth_cagr']):>7} {a['runway_count']:>4}"
+            f"{str(a['long_haul_pct']):>8} {str(a['pax_growth_yoy']):>7} {a['runway_count']:>4}"
         )
 
 

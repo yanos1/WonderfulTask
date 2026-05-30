@@ -5,11 +5,11 @@ from scoring import ScoringEngine, apply_modifier, clamp_modifier, MAX_SWING
 
 # synthetic universe with known ordering (no file/network dependency)
 AIRPORTS = [
-    {"iata": "AAA", "load_factor": 0.95, "passengers": 1_000_000, "pax_growth_cagr": 0.05,
+    {"iata": "AAA", "load_factor": 0.95, "passengers": 1_000_000, "pax_growth_yoy": 0.05,
      "runway_count": 4, "runway_length_ft": 12000},
-    {"iata": "BBB", "load_factor": 0.70, "passengers": 500_000, "pax_growth_cagr": 0.01,
+    {"iata": "BBB", "load_factor": 0.70, "passengers": 500_000, "pax_growth_yoy": 0.01,
      "runway_count": 2, "runway_length_ft": 8000},
-    {"iata": "CCC", "load_factor": 0.50, "passengers": 50_000, "pax_growth_cagr": None,
+    {"iata": "CCC", "load_factor": 0.50, "passengers": 50_000, "pax_growth_yoy": None,
      "runway_count": 1, "runway_length_ft": 4000},
 ]
 

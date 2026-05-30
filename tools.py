@@ -19,13 +19,12 @@ from scoring import ScoringEngine
 
 # Caveats surfaced to the user so the agent can communicate uncertainty honestly.
 DATA_NOTES = [
+    "Volume and YoY growth are current (FAA CY2024 enplanements, 2024 vs 2023).",
     "Structural ratios (load factor, long-haul %) are derived from 2013 BTS T-100 segment "
     "data — the most recent reliably-accessible segment-level source. Relative rankings are "
     "informative; absolute load factors are conservative vs. today.",
     "Long-haul % is domestic-only (international segments not yet ingested), so it understates "
     "long-haul share at international gateways.",
-    "Passenger growth is unavailable (current-year volume source not wired); its EPI weight is "
-    "redistributed across available signals.",
 ]
 
 # Friendly metric names -> (record field, human label, formatter)
@@ -170,7 +169,7 @@ def airport_profile(code: str) -> dict:
             "passengers_vintage": rec.get("passengers_vintage"),
             "load_factor": rec.get("load_factor"),
             "long_haul_pct": rec.get("long_haul_pct"),
-            "growth_cagr": rec.get("pax_growth_cagr"),
+            "growth_yoy": rec.get("pax_growth_yoy"),
             "runway_count": rec.get("runway_count"),
             "runway_length_ft": rec.get("runway_length_ft"),
         },

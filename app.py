@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from agent import Agent
 from llm import get_provider
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 st.set_page_config(page_title="Airport Investment Intelligence", page_icon="✈️", layout="wide")
 st.title("✈️ Airport Investment Intelligence Agent")

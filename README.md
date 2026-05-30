@@ -46,8 +46,8 @@ You ─► Streamlit chat
 ```
 
 - **Data** (`etl.py` → `data/airports.json`): OurAirports (metadata, runways) + BTS T-100
-  segment data (load factor, long-haul %) + runway-based feasibility — derived for ~900
-  US airports.
+  2013 segment data (load factor, long-haul %) + FAA CY2024 enplanements (current volume +
+  YoY growth) + runway-based feasibility — derived for ~900 US airports.
 - **Scoring** (`scoring.py`): `EPI = demand × feasibility × 100`, percentile-normalized.
 - **Tools** (`tools.py`): pure-Python, the graded non-LLM logic.
 - **Agent** (`agent.py`): route → execute → revise → narrate, with conversation history
@@ -62,17 +62,17 @@ python -m pytest -q
 ```
 
 ## Key assumptions (full list in DESIGN.md)
-- **Data vintage:** structural ratios (load factor, long-haul %) come from 2013 BTS T-100
-  segment data — the most recent reliably/programmatically downloadable segment-level
-  source. The ETL is year-parameterized; relative rankings are informative.
+- **Mixed vintage (by design):** volume + YoY growth are current (**FAA CY2024
+  enplanements**, 2024 vs 2023); structural ratios (load factor, long-haul %) come from
+  **2013** BTS T-100 segment data — the most recent reliably/programmatically downloadable
+  segment-level source. Relative rankings are informative; the ETL is year-parameterized.
 - **Long-haul is domestic-only** (international segments not yet ingested) → understates
   long-haul at international gateways.
-- **Passenger growth** is currently unavailable (the 2024 NTAD source is unreachable); the
-  pipeline degrades gracefully and redistributes that weight, disclosing the gap.
+- **Graceful degradation:** if a current source is unreachable, the pipeline falls back to
+  the 2013 baseline per airport and discloses the vintage rather than failing.
 - **Cargo is out of scope** — the thesis is passenger/terminal expansion.
 
 ## With more time
-- Wire a current-year volume source (FAA enplanements) → restores growth + 2024 volumes.
 - Ingest T-100 international segments → accurate long-haul for gateways.
 - Live AeroDataBox delays as a real EPI signal (currently display-only / graceful stub).
 - RAG over airport master plans/news to ground the LLM reviser's qualitative adjustments.

@@ -13,7 +13,7 @@ class GeminiProvider(LLMProvider):
     def __init__(self, model: str = "gemini-2.5-flash"):
         import warnings
 
-        warnings.filterwarnings("ignore", category=FutureWarning, module="google.generativeai")
+        warnings.filterwarnings("ignore", category=FutureWarning)
         import google.generativeai as genai
 
         genai.configure(api_key=os.environ["GEMINI_API_KEY"])

@@ -34,12 +34,36 @@ Tools:
 - airport_profile(code): full profile + unmet-demand explanation for one airport. Use for
   "unmet demand", "tell me about", "why".
 - flight_breakdown(code): long-haul flight share for one airport. Use for "long haul %".
+- explain: the user asks HOW a score was computed, the methodology, or "why these
+  numbers/scores" about a PREVIOUS answer. No args.
 
 Given the conversation, output JSON ONLY:
 {"tool": "<tool name or 'none'>", "args": {...}, "assumptions": ["..."]}
 Resolve cities to IATA codes when you know them (Los Angeles->LAX, Santa Ana->SNA,
 Anchorage->ANC, San Francisco->SFO, Boston->BOS). For follow-ups, use prior context to
 fill missing airports/regions."""
+
+METHODOLOGY = """How scores are computed (deterministic Python, not the LLM):
+- EPI = demand x feasibility x 100.
+- demand = weighted blend of percentile-normalized sub-scores: load_factor (0.40),
+  growth (0.25), volume (0.25), delay (0.10) -- weights renormalized over whichever
+  components have data. Each sub-score is the airport's PERCENTILE RANK of that metric
+  across ~900 US airports (so 0.93 means 93rd percentile).
+- feasibility = runway count + longest-runway percentile, mapped into [0.3, 1] and used
+  as a MULTIPLIER/gate: an airport with little physical room is downgraded even if demand
+  is high (this is why a busy but constrained airport like SNA scores lower).
+- FinalScore = EPI x clamp(LLM modifier, 1 +/- lambda*0.30). With lambda=0 the LLM has no
+  effect and FinalScore == EPI; otherwise the LLM may nudge within the band WITH a stated
+  reason, shown transparently.
+Data vintage: volume + growth are FAA CY2024; load factor + long-haul are 2013 BTS T-100."""
+
+EXPLAIN_SYSTEM = """You are an airport-investment analyst explaining HOW the deterministic
+scores were computed. Use the methodology below and the per-airport sub-scores from the
+previous result (provided as JSON). Walk through the math concretely for the airports in
+question (demand blend -> x feasibility -> x100), using their actual sub-score numbers.
+Do not invent numbers. Be clear and concise.
+
+""" + METHODOLOGY
 
 NARRATOR_SYSTEM = """You are an airport-investment analyst. Write a concise, professional
 answer to the user's question using ONLY the numbers in the provided tool result JSON.
@@ -89,6 +113,7 @@ class Agent:
         self.provider = provider
         self.lam = lam
         self.history: list[dict] = []  # [{role, content}] for multi-turn follow-ups
+        self.last_result: Optional[dict] = None  # last data result, for "explain these scores"
 
     # -- routing ---------------------------------------------------------- #
     def _route(self, user_message: str) -> dict:
@@ -105,6 +130,9 @@ class Agent:
 
     def _fallback_route(self, msg: str) -> dict:
         low = msg.lower()
+        if (("how" in low or "why" in low or "explain" in low)
+                and ("score" in low or "epi" in low or "comput" in low or "reach" in low)):
+            return {"tool": "explain", "args": {}}
         if "long haul" in low or "long-haul" in low:
             return {"tool": "flight_breakdown", "args": {"code": self._guess_airport(msg)}}
         if " vs " in low or "compare" in low:
@@ -212,6 +240,25 @@ class Agent:
             return f"{result['iata']}: long-haul share {result['long_haul_display']}."
         return "I couldn't determine how to answer that."
 
+    # -- explain (methodology for the previous scores) -------------------- #
+    def _explain(self, user_message: str) -> str:
+        prev = self.last_result
+        if self.provider:
+            ctx = json.dumps(prev) if prev else "(no previous scored result this session)"
+            msgs = [{"role": "user", "content":
+                     f"Question: {user_message}\n\nPrevious result JSON:\n{ctx}"}]
+            try:
+                return self.provider.complete(EXPLAIN_SYSTEM, msgs).strip()
+            except Exception:
+                pass
+        # deterministic fallback: spell out the math from the stored sub-scores
+        lines = [METHODOLOGY]
+        for r in (prev or {}).get("results", [])[:5] if prev else []:
+            subs = ", ".join(f"{k} {v}" for k, v in r.get("subscores", {}).items())
+            lines.append(f"\n{r['iata']}: demand={r.get('demand')} × feasibility="
+                         f"{r.get('feasibility')} × 100 = EPI {r.get('epi')}  (sub-scores: {subs})")
+        return "\n".join(lines)
+
     # -- public ----------------------------------------------------------- #
     def ask(self, user_message: str) -> dict:
         route = self._route(user_message)
@@ -219,9 +266,14 @@ class Agent:
         if tool in _DISPATCH:
             result = _DISPATCH[tool](route.get("args", {}))
             result = self._revise(result)
+            self.last_result = result  # remember for a later "explain these scores"
+            answer = self._narrate(user_message, result)
+        elif tool == "explain":
+            result = {"intent": "explain"}
+            answer = self._explain(user_message)
         else:
             result = {"intent": "none", "note": "No matching tool."}
-        answer = self._narrate(user_message, result)
+            answer = self._narrate(user_message, result)
         self.history.append({"role": "user", "content": user_message})
         self.history.append({"role": "assistant", "content": answer})
         return {"answer": answer, "route": route, "result": result}

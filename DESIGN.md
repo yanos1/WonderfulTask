@@ -36,8 +36,9 @@ FinalScore = EPI × clamp(LLMModifier, 1 − λ·0.30, 1 + λ·0.30)
 **Demand (the pressure signal).** Each component is **percentile-normalized across all ~900
 airports**, so the EPI is a stable absolute index and any subset (e.g. one region) is
 directly comparable. Load factor is the centerpiece — full planes mean demand is being
-turned away. Components with no data anywhere (currently growth, delay) are dropped and
-their weight **redistributed**, so the formula stays correct as data sources are added.
+turned away. Components with no data anywhere (currently `delay`) are dropped and their
+weight **redistributed**, so the formula stays correct as data sources are added. (This is
+exactly how `growth` went live the moment FAA enplanements were wired in.)
 
 **Feasibility (the gate).** A multiplier in `[0.3, 1]` from runway count + longest runway
 (proxy for physical room/infrastructure). As a *multiplier*, it can veto: an airport with
@@ -95,22 +96,25 @@ adjustments are dropped), and is shown transparently in the UI as `EPI → modif
 
 ## 5. Assumptions, uncertainty & scoping
 
-- **Vintage:** load factor and long-haul % are from **2013** BTS T-100 segment data (the most
-  recent reliably/programmatically downloadable segment-level source with seats + distance).
-  Industry load factors have risen since, so absolute values are conservative, but the
-  *relative* ranking the EPI uses remains informative. ETL is year-parameterized.
+- **Mixed vintage (deliberate):** volume + YoY growth are **current** (FAA CY2024
+  enplanements, 2024 vs 2023); load factor and long-haul % are from **2013** BTS T-100
+  segment data (the most recent reliably/programmatically downloadable segment-level source
+  with seats + distance). Industry load factors have risen since, so absolute values are
+  conservative, but the *relative* ranking the EPI uses remains informative. ETL is
+  year-parameterized.
 - **Long-haul is domestic-only** — international segments not yet ingested — so it understates
   long-haul share at international gateways (ANC, SFO).
-- **Growth unavailable:** every programmatic route to the 2024 NTAD source failed (restricted
-  hosted view); the pipeline degrades gracefully, redistributes the growth weight, and
-  surfaces the gap. This is a *fast-follow*, not a redesign (FAA enplanements restores it).
+- **Resilience:** the 2024 NTAD path we first tried is a restricted hosted view that rejects
+  feature queries; the ETL falls back per-airport to the 2013 baseline and records the
+  vintage, rather than failing. (Volume/growth now come from FAA; the fallback remains for
+  airports absent from the FAA file.)
 - **Cargo out of scope:** the thesis is passenger/terminal expansion; all-cargo service
   classes are filtered out, so cargo-dominant airports (ANC) are judged on passenger terms.
 - **Feasibility ≠ true headroom:** runways proxy for physical room.
 
 ## 6. With more time
-1. **Current-year volume + growth** via FAA enplanements (the highest-value fix).
-2. **International T-100 segments** → accurate long-haul at gateways.
-3. **Live delays** (AeroDataBox) promoted from display-only to a real EPI signal.
+1. **International T-100 segments** → accurate long-haul at gateways.
+2. **Live delays** (AeroDataBox) promoted from display-only to a real EPI signal.
+3. **A current-year segment source** → bring load factor to 2024 (removes the mixed vintage).
 4. **RAG over master plans / news** to ground the reviser's qualitative adjustments.
 5. **Voice input**, trend charts, and per-component weight sliders in the UI.
