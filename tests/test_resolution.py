@@ -1,0 +1,43 @@
+"""Tests for region resolution and natural-language airport resolution."""
+
+import pytest
+
+from regions import resolve_region
+
+
+def test_region_exact():
+    assert resolve_region("New England") == ["ME", "NH", "VT", "MA", "RI", "CT"]
+
+
+def test_region_is_case_and_spacing_tolerant():
+    assert resolve_region("  new   england ") == resolve_region("New England")
+    assert resolve_region("NEW ENGLAND") == resolve_region("New England")
+
+
+def test_region_phrase_contains():
+    # "airports in the new england region" should still resolve
+    assert resolve_region("the new england region") == resolve_region("New England")
+
+
+def test_unknown_region_is_none():
+    assert resolve_region("Atlantis") is None
+    assert resolve_region(None) is None
+
+
+# entity resolution touches the real dataset; skip cleanly if the ETL hasn't been run
+tools = pytest.importorskip("tools")
+
+
+def _has_data():
+    try:
+        return tools.resolve_code("LAX") == "LAX"
+    except Exception:
+        return False
+
+
+@pytest.mark.skipif(not _has_data(), reason="airports.json not built (run etl.py)")
+def test_resolve_code_by_iata_and_name():
+    assert tools.resolve_code("LAX") == "LAX"
+    assert tools.resolve_code("Santa Ana") == "SNA"
+    assert tools.resolve_code("Anchorage") == "ANC"
+    assert tools.resolve_code("definitely not an airport zzz") is None

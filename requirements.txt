@@ -1,0 +1,18 @@
+# Airport Investment Intelligence Agent — dependencies
+
+# Data ETL + scoring
+pandas>=2.0
+requests>=2.31
+
+# Chat UI
+streamlit>=1.30
+
+# LLM providers (function calling) — swappable via LLMProvider interface
+google-generativeai>=0.8   # Gemini (free-tier API key, no billing)
+anthropic>=0.40            # Claude (optional second provider)
+
+# Config / secrets
+python-dotenv>=1.0
+
+# Tests
+pytest>=8.0
