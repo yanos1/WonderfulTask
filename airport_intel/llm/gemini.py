@@ -30,4 +30,10 @@ class GeminiProvider(LLMProvider):
             for m in messages
         ]
         resp = model.generate_content(contents)
+        u = getattr(resp, "usage_metadata", None)  # Gemini returns token counts here
+        if u is not None:
+            self._record_usage(
+                getattr(u, "prompt_token_count", 0),
+                getattr(u, "candidates_token_count", 0),
+            )
         return resp.text

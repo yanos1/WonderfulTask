@@ -25,9 +25,12 @@ from .llm import LLMProvider
 # --------------------------------------------------------------------------- #
 ROUTER_SYSTEM = """You route airport-investment questions to ONE deterministic tool.
 Tools:
-- rank_region(region, limit): rank airports by Expansion Profitability Index. region is a
-  US region name like "New England" or null for nationwide. Use for "which airports are
-  strong candidates / best / top".
+- rank_region(region, limit, metric): rank airports. region is a US region name like
+  "New England" or null for nationwide. By DEFAULT (metric null) ranks by the Expansion
+  Profitability Index -- use for "which airports are strong candidates / best / top". If
+  the user asks to rank by ONE specific KPI, set metric to one of: congestion (load
+  factor), volume, growth, long_haul, runways -- e.g. "rank airports by growth" ->
+  metric="growth". Do NOT route metric-specific ranking to aviation_qa; the data is ours.
 - compare_airports(codes, metric): compare 2+ airports on a metric. metric is one of
   congestion, volume, long_haul, growth, runways. codes are airport names or IATA codes.
 - airport_profile(code): full profile + unmet-demand explanation for one airport. Use for
@@ -61,9 +64,10 @@ METHODOLOGY = """How scores are computed (deterministic Python, not the LLM):
 - feasibility = runway count + longest-runway percentile, mapped into [0.3, 1] and used
   as a MULTIPLIER/gate: an airport with little physical room is downgraded even if demand
   is high (this is why a busy but constrained airport like SNA scores lower).
-- FinalScore = EPI x clamp(LLM modifier, 1 +/- lambda*0.30). With lambda=0 the LLM has no
-  effect and FinalScore == EPI; otherwise the LLM may nudge within the band WITH a stated
-  reason, shown transparently.
+- FinalScore = EPI x clamp(LLM modifier, 1 +/- lambda*0.40). The modifier is built from a
+  LIST of separately-justified factors (each a signed nudge like +0.08 or -0.04) that sum
+  together. With lambda=0 the LLM has no effect and FinalScore == EPI; otherwise it may
+  nudge within the band WITH stated reasons, shown transparently.
 Data vintage: volume + growth are FAA CY2024; load factor + long-haul are 2013 BTS T-100."""
 
 EXPLAIN_SYSTEM = """You are an airport-investment analyst explaining HOW the deterministic
@@ -92,13 +96,21 @@ briefly surface the relevant caveat (data vintage / limitations) so the user und
 uncertainty. Keep it tight -- a short paragraph or a small list -- but every figure you
 cite should earn its place by backing an insight."""
 
-REVISER_SYSTEM = """You may apply a small qualitative adjustment to deterministic airport
-scores, based on real-world knowledge the formula cannot see (e.g. recently announced
-terminal funding, known geographic/runway constraints, regulatory limits).
-For each airport you wish to adjust, return a modifier and a SPECIFIC factual reason.
-A modifier of 1.0 means no change. You MUST justify any modifier != 1.0; unjustified
-adjustments are discarded. Output JSON ONLY:
-{"modifiers": [{"iata": "SFO", "modifier": 1.08, "reason": "..."}]}"""
+REVISER_SYSTEM = """You apply qualitative adjustments to deterministic airport scores, based
+on real-world knowledge the formula cannot see (e.g. recently announced terminal funding,
+known geographic/runway constraints, regulatory or slot limits, major airline hub changes,
+ground-access projects).
+
+For each airport you want to adjust, return a LIST of factors. Each factor is:
+- "reason": a SPECIFIC, factual statement (no vague hand-waving)
+- "impact": a signed fractional nudge — +0.08 raises the score ~8%, -0.05 lowers it ~5%
+
+List several factors when several distinct forces apply; their impacts add up, so keep each
+one small and individually defensible. A factor with no concrete reason is discarded. Omit
+any airport you have nothing specific to say about. Output JSON ONLY:
+{"airports": [{"iata": "SFO", "factors": [
+    {"reason": "FAA awarded $50M for a new Terminal 3 concourse in 2024", "impact": 0.08},
+    {"reason": "bay-side site sharply limits new runway capacity", "impact": -0.04}]}]}"""
 
 AVIATION_QA_SYSTEM = """You are the assistant for an Airport Investment Intelligence tool.
 The user asked a genuine aviation question (airlines, airports, air travel, infrastructure,
@@ -143,7 +155,7 @@ def _parse_json(text: str) -> Optional[dict]:
 
 
 _DISPATCH = {
-    "rank_region": lambda a: tools.rank_region(a.get("region"), int(a.get("limit", 5) or 5)),
+    "rank_region": lambda a: tools.rank_region(a.get("region"), a.get("limit", 5), a.get("metric")),
     "compare_airports": lambda a: tools.compare_airports(a.get("codes", []), a.get("metric", "congestion")),
     "airport_profile": lambda a: tools.airport_profile(a.get("code", "")),
     "flight_breakdown": lambda a: tools.flight_breakdown(a.get("code", "")),
@@ -188,15 +200,19 @@ class Agent:
                            "subscores": r["subscores"]} for r in shortlist]})}]
         try:
             raw = self.provider.complete(REVISER_SYSTEM, prompt, json_mode=True)
-            mods = {m["iata"]: m for m in (_parse_json(raw) or {}).get("modifiers", [])}
+            mods = {m["iata"]: m for m in (_parse_json(raw) or {}).get("airports", [])}
         except Exception:
             mods = {}
         for r in shortlist:
             m = mods.get(r["iata"], {})
-            adj = scoring.apply_modifier(r["epi"], m.get("modifier"), self.lam, m.get("reason"))
+            adj = scoring.apply_factors(r["epi"], m.get("factors", []), self.lam)
             r["final_score"] = adj["final_score"]
             r["modifier"] = adj["modifier"]
-            r["modifier_reason"] = adj["reason"]
+            r["factors"] = adj["factors"]
+            # one-line summary for the table: "reason (+8%); reason (-4%)"
+            r["modifier_reason"] = "; ".join(
+                f"{f['reason']} ({f['impact']:+.0%})" for f in adj["factors"]
+            ) or None
         shortlist.sort(key=lambda r: r["final_score"], reverse=True)
         result["reviser_applied"] = True
         return result

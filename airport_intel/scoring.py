@@ -6,9 +6,10 @@ Expansion Profitability Index (EPI):
     EPI       = demand * Feasibility * 100            (Feasibility in [0.3, 1])
     FinalScore = EPI * clamp(LLMModifier, 1 - λ·MAX_SWING, 1 + λ·MAX_SWING)
 
-The LLM never computes the base EPI. It may only return a *bounded, justified* modifier
-(see scoring.apply_modifier); λ ("llm_influence", 0..1) caps how far it can move a score.
-λ=0 (or a missing/blank justification) ⇒ FinalScore == EPI.
+The LLM never computes the base EPI. It may only return *bounded, justified* adjustments —
+either a single modifier (scoring.apply_modifier) or a list of separately-justified factors
+that sum into one (scoring.apply_factors). λ ("llm_influence", 0..1) caps how far it can move
+a score (λ=1 ⇒ ±40%). λ=0 (or a missing/blank justification) ⇒ FinalScore == EPI.
 
 All normalization is by percentile rank across the full airport universe, so the EPI is a
 stable absolute index and any subset ranking (e.g. one region) is directly comparable.
@@ -19,7 +20,7 @@ from __future__ import annotations
 import bisect
 from typing import Optional
 
-MAX_SWING = 0.30          # λ=1 lets the LLM move a score at most ±30%
+MAX_SWING = 0.40          # λ=1 lets the LLM move a score at most ±40%
 FEASIBILITY_FLOOR = 0.30  # weak proxy: dampen, never nuke
 
 # Demand components and their default weights (renormalized over whatever data exists).
@@ -149,4 +150,37 @@ def apply_modifier(epi: float, modifier: Optional[float], lam: float, reason: Op
         "modifier": round(effective, 4),
         "final_score": round(epi * effective, 2),
         "reason": reason if effective != 1.0 else None,
+    }
+
+
+def apply_factors(epi: float, factors: Optional[list], lam: float) -> dict:
+    """Combine a LIST of justified factors into one bounded modifier.
+
+    Each factor is {"reason": str, "impact": float}, where impact is a signed *fractional*
+    nudge (+0.08 ≈ +8%, -0.05 ≈ -5%). Only factors carrying a concrete reason count; the
+    net modifier is 1 + Σ(impacts), then clamped into the λ band. λ=0 ⇒ no effect. This is
+    the multi-factor analogue of apply_modifier: instead of one opaque scalar the LLM gives
+    several small, separately-justified forces that add up and stay transparent.
+    """
+    kept: list[dict] = []
+    net = 0.0
+    for f in factors or []:
+        if not isinstance(f, dict):
+            continue
+        reason = (f.get("reason") or "").strip()
+        impact = f.get("impact")
+        if not reason or impact is None:
+            continue
+        try:
+            imp = float(impact)
+        except (TypeError, ValueError):
+            continue
+        net += imp
+        kept.append({"reason": reason, "impact": round(imp, 4)})
+    effective = clamp_modifier(1.0 + net, lam) if kept else 1.0
+    return {
+        "epi": round(epi, 2),
+        "modifier": round(effective, 4),
+        "final_score": round(epi * effective, 2),
+        "factors": kept if effective != 1.0 else [],
     }

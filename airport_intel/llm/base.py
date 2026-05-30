@@ -24,6 +24,27 @@ class LLMProvider(ABC):
     def complete(self, system: str, messages: list[Message], json_mode: bool = False) -> str:
         """Return the model's text reply. If json_mode, the reply must be a JSON object."""
 
+    # -- usage metering (shared by all providers) -------------------------- #
+    @property
+    def metrics(self):
+        """Lazily resolved usage tracker; defaults to the process-wide ledger.
+
+        Lazy so subclasses need no super().__init__() call, and so tests can inject a
+        custom tracker via ``provider._metrics = MetricsTracker(path)``.
+        """
+        m = getattr(self, "_metrics", None)
+        if m is None:
+            from ..metrics import global_tracker
+            m = self._metrics = global_tracker()
+        return m
+
+    def _record_usage(self, input_tokens, output_tokens) -> None:
+        """Record one call's token usage. Best-effort: never let metering break an answer."""
+        try:
+            self.metrics.record(self.model, input_tokens or 0, output_tokens or 0)
+        except Exception:  # noqa: BLE001 - metering is non-critical
+            pass
+
 
 # Registry of (factory, env var) keyed by provider name.
 def _make_gemini(model: Optional[str]):

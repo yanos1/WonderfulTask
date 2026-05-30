@@ -10,13 +10,14 @@ yields the most return on **passenger/flight capacity**. The core thesis:
 > cannot physically expand is a poor investment despite the demand.
 
 The system is a **tool-calling agent**: the LLM understands the question and routes it to
-**deterministic Python tools** that compute the ranking; the LLM then explains the result.
+**deterministic Python tools** that compute the ranking; then llm call revises the score based on finding it has that our
+data was blind to. Last but not least, the LLM explains the result .
 This cleanly satisfies the brief's requirement for *deterministic ranking, not just LLM
 output*, while keeping the conversation natural.
 
 ```
 User → Streamlit chat
-  1. ROUTE   (LLM)  NL + history → {tool, args}        ← or deterministic keyword fallback
+  1. ROUTE   (LLM)  NL + history → {tool, args}
   2. EXECUTE (code) deterministic tool computes EPI, ranking, breakdowns + a `steps` trace
   3. REVISE  (LLM)  optional bounded, justified score modifier on a ranking shortlist
   4. NARRATE (LLM)  professional answer grounded strictly in the returned numbers
@@ -28,9 +29,9 @@ so follow-ups like *"and what about SFO?"* resolve against prior context.
 ## 2. Scoring methodology — Expansion Profitability Index (EPI)
 
 ```
-demand     = weighted, percentile-normalized blend of { load factor, growth, volume }
+demand     = weighted, percentile-normalized blend of { load factor, growth, volume, long haul }
 EPI        = demand × Feasibility × 100                       Feasibility ∈ [0.3, 1]
-FinalScore = EPI × clamp(LLMModifier, 1 − λ·0.30, 1 + λ·0.30)
+FinalScore = EPI × clamp(LLMModifier, 1 − λ·0.40, 1 + λ·0.40)
 ```
 
 **Demand (the pressure signal).** A weighted blend of percentile-normalized components —

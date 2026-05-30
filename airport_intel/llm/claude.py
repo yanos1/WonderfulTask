@@ -27,4 +27,7 @@ class ClaudeProvider(LLMProvider):
             system=system,
             messages=msgs,
         )
+        u = getattr(resp, "usage", None)  # Anthropic returns exact token counts
+        if u is not None:
+            self._record_usage(getattr(u, "input_tokens", 0), getattr(u, "output_tokens", 0))
         return "".join(block.text for block in resp.content if getattr(block, "type", "") == "text")

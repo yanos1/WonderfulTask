@@ -40,6 +40,23 @@ _METRICS = {
 }
 
 LONG_HAUL_MILES = 2500
+MAX_RANK_LIMIT = 50  # hard cap so a runaway "list everything" stays a sane shortlist
+
+
+def _clean_limit(limit, default: int = 5) -> int:
+    """Coerce a router-supplied limit into [1, MAX_RANK_LIMIT].
+
+    The LLM can hand us junk: None, 0, a negative number (which would make scored[:limit]
+    silently drop from the END of the list), or a non-int string like "5.5" (which would
+    raise). Normalize all of it instead of crashing or mis-slicing.
+    """
+    try:
+        n = int(float(limit))
+    except (TypeError, ValueError):
+        return default
+    if n <= 0:
+        return default
+    return min(n, MAX_RANK_LIMIT)
 
 _repo: Optional[Repository] = None
 _engine: Optional[ScoringEngine] = None
@@ -56,21 +73,26 @@ def _engines():
 # --------------------------------------------------------------------------- #
 # Entity resolution: natural-language name/code -> validated IATA code
 # --------------------------------------------------------------------------- #
-def resolve_code(query: str) -> Optional[str]:
+def _resolve_matches(query: str) -> list[dict]:
+    """All airport records a query could refer to, best (highest-volume) first.
+
+    A 3-letter IATA code resolves to exactly that airport. Otherwise we match on a whole
+    WORD in the city/name (or the full string), NOT an arbitrary substring -- otherwise
+    "LA" matches "atLAnta". Multiple hits (e.g. "Portland" -> PDX/PWM) are all returned so
+    callers can flag the ambiguity instead of silently picking one.
+    """
     repo, _ = _engines()
     if not query:
-        return None
+        return []
     q = query.strip().upper()
     if len(q) == 3 and repo.exists(q):
-        return q
+        return [repo.get(q)]
     ql = query.strip().lower()
 
     def _tokens(text: Optional[str]) -> set[str]:
         # split on non-alphanumerics so "Los Angeles Intl" -> {los, angeles, intl}
         return {t for t in re.split(r"[^a-z0-9]+", (text or "").lower()) if t}
 
-    # Match on a whole word in the city/name (or the full string), NOT an arbitrary
-    # substring -- otherwise "LA" matches "atLAnta". Prefer the highest-volume match.
     matches = [
         a for a in repo.all()
         if ql == (a.get("city") or "").lower()
@@ -78,10 +100,32 @@ def resolve_code(query: str) -> Optional[str]:
         or ql in _tokens(a.get("city"))
         or ql in _tokens(a.get("name"))
     ]
-    if matches:
-        matches.sort(key=lambda a: a.get("passengers") or 0, reverse=True)
-        return matches[0]["iata"]
-    return None
+    matches.sort(key=lambda a: a.get("passengers") or 0, reverse=True)
+    return matches
+
+
+def resolve_code(query: str) -> Optional[str]:
+    """Best single IATA code for a query (highest-volume match), or None."""
+    matches = _resolve_matches(query)
+    return matches[0]["iata"] if matches else None
+
+
+def _ambiguity_note(query: str, matches: list[dict]) -> Optional[str]:
+    """Warn when a name matched airports in MORE THAN ONE state (the dangerous case:
+    e.g. 'Portland' -> PDX Oregon vs PWM Maine). Same-metro multi-airport hits
+    (e.g. Houston's IAH/HOU) are not flagged -- picking the busiest is reasonable there."""
+    states = {(m.get("state") or "").upper() for m in matches if m.get("state")}
+    if len(matches) < 2 or len(states) < 2:
+        return None
+    chosen = matches[0]
+    others = ", ".join(
+        f"{m['iata']} ({m.get('city')}, {m.get('state')})" for m in matches[1:4]
+    )
+    return (
+        f"'{query}' is ambiguous — used {chosen['iata']} "
+        f"({chosen.get('city')}, {chosen.get('state')}; highest passenger volume). "
+        f"Other matches: {others}. Pass an IATA code to pick a specific airport."
+    )
 
 
 def _slim(scored: dict, rec: dict) -> dict:
@@ -100,9 +144,31 @@ def _slim(scored: dict, rec: dict) -> dict:
 # --------------------------------------------------------------------------- #
 # Tools
 # --------------------------------------------------------------------------- #
-def rank_region(region: Optional[str] = None, limit: int = 5, weights: Optional[dict] = None) -> dict:
-    """Rank airports by Expansion Profitability Index (Q1). region=None ranks nationally."""
+def rank_region(region: Optional[str] = None, limit: int = 5,
+                metric: Optional[str] = None, weights: Optional[dict] = None) -> dict:
+    """Rank airports for expansion (Q1). region=None ranks nationally.
+
+    By default airports are ranked by the Expansion Profitability Index (EPI). Pass a
+    single `metric` (e.g. "growth", "volume", "congestion") to rank by that raw KPI
+    instead -- this answers "rank airports by growth" with real data rather than
+    silently force-fitting an EPI ranking onto it. EPI is still reported per row for
+    context. An unknown metric errors (like compare) instead of mislabeling.
+    """
     repo, eng = _engines()
+    limit = _clean_limit(limit)
+
+    metric_info = None
+    if metric:
+        metric_info = _METRICS.get(metric.lower())
+        if metric_info is None:
+            supported = sorted({lbl for _, lbl, _ in _METRICS.values()})
+            return {
+                "intent": "rank",
+                "error": f"Unsupported metric '{metric}'. Supported metrics: "
+                         f"{', '.join(supported)}.",
+                "notes": list(DATA_NOTES),
+            }
+
     steps = []
     if region:
         states = resolve_region(region)
@@ -115,6 +181,32 @@ def rank_region(region: Optional[str] = None, limit: int = 5, weights: Optional[
         candidates = repo.find(min_passengers=1)
         steps.append("No region given -> ranking all US airports")
 
+    if metric_info is not None:
+        field, label, fmt = metric_info
+        # Rank by the raw KPI, high -> low. Airports missing the metric can't be ranked
+        # on it, so drop them rather than sorting None to an arbitrary end.
+        rated = [(a, a.get(field)) for a in candidates]
+        rated = [(a, v) for a, v in rated if v is not None]
+        rated.sort(key=lambda av: av[1], reverse=True)
+        steps.append(f"Ranked {len(rated)} airports with data on {label} (field={field}), high to low")
+        results = []
+        for rec, val in rated[:limit]:
+            row = _slim(eng.epi(rec, weights), rec)
+            row["metric_value"] = val
+            row["metric_display"] = fmt(val)
+            results.append(row)
+        steps.append(f"Selected top {len(results)} by {label}")
+        return {
+            "intent": "rank",
+            "region": region,
+            "states": states,
+            "ranked_by": label,
+            "candidates_considered": len(candidates),
+            "results": results,
+            "steps": steps,
+            "notes": DATA_NOTES,
+        }
+
     steps.append(f"Scored {len(candidates)} airports on EPI = demand x feasibility x 100")
     scored = sorted((eng.epi(a, weights) for a in candidates), key=lambda x: x["epi"], reverse=True)
     by_code = {a["iata"]: a for a in candidates}
@@ -124,6 +216,7 @@ def rank_region(region: Optional[str] = None, limit: int = 5, weights: Optional[
         "intent": "rank",
         "region": region,
         "states": states,
+        "ranked_by": "EPI",
         "candidates_considered": len(candidates),
         "results": results,
         "weights": weights or "default",
@@ -135,36 +228,62 @@ def rank_region(region: Optional[str] = None, limit: int = 5, weights: Optional[
 def compare_airports(codes: list[str], metric: str = "congestion") -> dict:
     """Compare airports on a chosen KPI (Q2, e.g. congestion=load factor)."""
     repo, eng = _engines()
-    field, label, fmt = _METRICS.get(metric.lower(), _METRICS["congestion"])
+    metric_info = _METRICS.get((metric or "").lower())
+    if metric_info is None:
+        # Don't silently mislabel an unsupported metric (e.g. "delay") as load factor.
+        supported = sorted({lbl for _, lbl, _ in _METRICS.values()})
+        return {
+            "intent": "compare",
+            "error": f"Unsupported metric '{metric}'. Supported metrics: "
+                     f"{', '.join(supported)}.",
+            "notes": list(DATA_NOTES),
+        }
+    field, label, fmt = metric_info
     steps = [f"Comparing on '{label}' (field={field})"]
-    rows = []
+    notes = list(DATA_NOTES)
+    rows, seen = [], set()
     for raw in codes:
-        code = resolve_code(raw)
+        matches = _resolve_matches(raw)
+        code = matches[0]["iata"] if matches else None
         if not code:
             rows.append({"input": raw, "error": "not found in dataset"})
             continue
+        if code in seen:  # "compare LA and Los Angeles" -> don't compare LAX to itself
+            steps.append(f"Skipped duplicate reference '{raw}' -> {code}")
+            continue
+        seen.add(code)
+        note = _ambiguity_note(raw, matches)
+        if note:
+            notes.append(note)
         rec = repo.get(code)
         val = rec.get(field)
         rows.append({
             "iata": code, "name": rec.get("name"), "city": rec.get("city"),
             "value": val, "display": fmt(val), "epi": eng.epi(rec)["epi"],
         })
+    if len(seen) < 2:
+        steps.append("Need at least 2 distinct airports to compare.")
     valid = [r for r in rows if r.get("value") is not None]
     if len(valid) >= 2:
         hi = max(valid, key=lambda r: r["value"])
         steps.append(f"Highest {label}: {hi['iata']} ({hi['display']})")
     return {
         "intent": "compare", "metric": label, "results": rows,
-        "steps": steps, "notes": DATA_NOTES,
+        "steps": steps, "notes": notes,
     }
 
 
 def airport_profile(code: str) -> dict:
     """Full profile incl. EPI + unmet-demand explanation (Q4: 'unmet demand in X and why')."""
     repo, eng = _engines()
-    resolved = resolve_code(code)
+    matches = _resolve_matches(code)
+    resolved = matches[0]["iata"] if matches else None
     if not resolved:
-        return {"error": f"Airport '{code}' not found.", "notes": DATA_NOTES}
+        return {"error": f"Airport '{code}' not found.", "notes": list(DATA_NOTES)}
+    notes = list(DATA_NOTES)
+    note = _ambiguity_note(code, matches)
+    if note:
+        notes.append(note)
     rec = repo.get(resolved)
     scored = eng.epi(rec)
     unmet = eng.unmet_demand(rec)
@@ -193,16 +312,21 @@ def airport_profile(code: str) -> dict:
             f"EPI={scored['epi']} (demand={scored['demand']}, feasibility={scored['feasibility']})",
             f"Unmet-demand score={unmet['unmet_demand_score']}",
         ],
-        "notes": DATA_NOTES,
+        "notes": notes,
     }
 
 
 def flight_breakdown(code: str) -> dict:
     """Long-haul share and route mix for an airport (Q3: '% long-haul out of X')."""
     repo, _ = _engines()
-    resolved = resolve_code(code)
+    matches = _resolve_matches(code)
+    resolved = matches[0]["iata"] if matches else None
     if not resolved:
-        return {"error": f"Airport '{code}' not found.", "notes": DATA_NOTES}
+        return {"error": f"Airport '{code}' not found.", "notes": list(DATA_NOTES)}
+    notes = list(DATA_NOTES)
+    note = _ambiguity_note(code, matches)
+    if note:
+        notes.append(note)
     rec = repo.get(resolved)
     lh = rec.get("long_haul_pct")
     return {
@@ -217,5 +341,5 @@ def flight_breakdown(code: str) -> dict:
             f"Long-haul = flights with segment distance > {LONG_HAUL_MILES} mi",
             f"Long-haul share = {lh:.1%}" if lh is not None else "Long-haul share unavailable",
         ],
-        "notes": DATA_NOTES,
+        "notes": notes,
     }

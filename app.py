@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from airport_intel import backtest
 from airport_intel.agent import Agent
 from airport_intel.llm import get_provider
+from airport_intel.metrics import global_tracker
 from airport_intel.scoring import MAX_SWING
 from airport_intel.tools import DATA_NOTES
 
@@ -21,11 +22,32 @@ load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 # menu instead of being repeated under every answer.
 _ASSUMPTIONS_MD = "### Assumptions & caveats\n\n" + "\n".join(f"- {n}" for n in DATA_NOTES)
 
+
+def _metrics_md() -> str:
+    """Lifetime LLM usage for the top-right "⋮" → About dialog.
+
+    Streamlit's menu_items only allows the fixed keys About / Get help / Report a Bug, so
+    metrics live as a section inside About. The whole script reruns after every answer, so
+    set_page_config runs again and this section refreshes with the latest cumulative totals.
+    Totals are persisted and monotonic — they accumulate across runs and never reset.
+    """
+    t = global_tracker().snapshot()
+    return (
+        "\n\n---\n\n### Metrics (lifetime)\n\n"
+        f"- **LLM calls:** {t.calls:,}\n"
+        f"- **Tokens:** {t.total_tokens:,} "
+        f"({t.input_tokens:,} in / {t.output_tokens:,} out)\n"
+        f"- **Estimated cost:** ${t.cost_usd:,.4f}\n\n"
+        "_Cost is an estimate from public per-model rates; totals persist across runs "
+        "and only ever increase._"
+    )
+
+
 st.set_page_config(
     page_title="Airport Investment Intelligence",
     page_icon="✈️",
     layout="wide",
-    menu_items={"About": _ASSUMPTIONS_MD},
+    menu_items={"About": _ASSUMPTIONS_MD + _metrics_md()},
 )
 st.title("✈️ Airport Investment Intelligence Agent")
 st.caption("Ranks US airports for renovation/expansion ROI using a deterministic Expansion "
@@ -107,7 +129,7 @@ with st.sidebar:
     lam = st.slider(
         "LLM influence (λ)", 0.0, 1.0, 0.0, 0.05,
         help="How much the LLM may adjust deterministic scores, when calculating an investment score. 0 = pure deterministic; "
-             "1 = ±30% max, and only with a written justification.",
+             "1 = ±40% max, and only with written justifications.",
     )
 
 
@@ -152,8 +174,14 @@ def render_result(result: dict):
     """Transparency panels: the route, the deterministic steps, and the scoring table."""
     if result.get("results") and result.get("intent") == "rank":
         rows = []
+        # When ranked by a single KPI (e.g. growth), show that metric as the lead column.
+        ranked_by = result.get("ranked_by")
+        metric_col = ranked_by if ranked_by and ranked_by != "EPI" else None
         for r in result["results"]:
-            row = {"IATA": r["iata"], "City": r.get("city"), "EPI": r["epi"]}
+            row = {"IATA": r["iata"], "City": r.get("city")}
+            if metric_col:
+                row[metric_col] = r.get("metric_display")
+            row["EPI"] = r["epi"]
             if "final_score" in r:
                 row["Modifier"] = r.get("modifier")
                 row["Final"] = r["final_score"]
