@@ -9,6 +9,7 @@ import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
 
+from airport_intel import backtest
 from airport_intel.agent import Agent
 from airport_intel.llm import get_provider
 from airport_intel.scoring import MAX_SWING
@@ -30,14 +31,67 @@ st.title("✈️ Airport Investment Intelligence Agent")
 st.caption("Ranks US airports for renovation/expansion ROI using a deterministic Expansion "
            "Profitability Index, with an LLM for routing, explanation, and a bounded score nudge.")
 
+
+# --------------------------------------------------------------------------- #
+# Validation panel — does the EPI actually predict real-world funding decisions?
+# A separate analysis surface (the chat agent + router are untouched): the EPI is
+# backtested against the FAA Airport Terminal Program ($5B of competitive grants).
+# --------------------------------------------------------------------------- #
+@st.cache_data(show_spinner=False)
+def _run_backtest() -> dict:
+    return backtest.run_backtest()
+
+
+with st.expander("📊 Is the EPI any good? — backtest vs $3.8B of real FAA terminal grants"):
+    try:
+        bt = _run_backtest()
+    except FileNotFoundError:
+        st.info("Funding ground truth not built yet — run `python -m etl.build_funding`.")
+    else:
+        st.caption(
+            f"Validated against the FAA Airport Terminal Program (ATP), a *competitive* grant "
+            f"program that funds passenger-terminal expansion — the same question the EPI scores. "
+            f"{bt['funded_in_universe']} of {bt['universe']} airports were funded "
+            f"(base rate {bt['base_rate']:.0%}); a good index should rank funded airports near the top."
+        )
+        p20 = next((p for p in bt["precision"] if p["n"] == 20), bt["precision"][0])
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Precision@20 (EPI)", f"{p20['epi_precision']:.0%}",
+                  help="Share of the top-20 EPI airports that actually received ATP funding.")
+        c2.metric("vs. base rate", f"{bt['base_rate']:.0%}",
+                  delta=f"{p20['epi_precision'] - bt['base_rate']:+.0%} over chance")
+        c3.metric("Spearman(EPI, grant $)", f"{bt['spearman_epi_grant_usd']:+.2f}",
+                  help="Rank correlation between EPI and ATP dollars across all airports.")
+
+        st.markdown("**Precision@N — EPI vs. a volume-only baseline**")
+        st.dataframe(pd.DataFrame([
+            {"N": p["n"], "EPI": f"{p['epi_precision']:.0%}",
+             "Volume-only": f"{p['volume_precision']:.0%}",
+             "EPI lift": (f"{p['lift_vs_volume']:+.0%}"
+                          if p["lift_vs_volume"] is not None else "n/a")}
+            for p in bt["precision"]
+        ]), hide_index=True, use_container_width=True)
+        st.caption("The EPI tracks real funding strongly — and on par with airport size alone, "
+                   "because ATP funding is itself size-driven. So the differentiated output is the "
+                   "*unfunded* high-EPI shortlist below: it deliberately diverges from raw size.")
+
+        st.markdown(f"**🎯 Investment shortlist — high EPI, _not yet_ ATP-funded "
+                    f"(≥ {bt['shortlist_min_passengers']:,} passengers)**")
+        st.dataframe(pd.DataFrame([
+            {"IATA": r["iata"], "City": r.get("city"), "State": r.get("state"),
+             "EPI": r["epi"], "Passengers": r["passengers"]}
+            for r in bt["shortlist"]
+        ]), hide_index=True, use_container_width=True)
+
+
 # --------------------------------------------------------------------------- #
 # Sidebar — model, λ, keys
 # --------------------------------------------------------------------------- #
 with st.sidebar:
     st.header("Settings")
     model_choice = st.selectbox(
-        "Model", ["Deterministic (no LLM)", "gemini", "claude"],
-        help="Pick an LLM for NL routing + explanations, or run the deterministic fallback.",
+        "Model", ["gemini", "claude"],
+        help="The LLM that powers routing, explanation, and the bounded score nudge.",
     )
 
     # let the user paste a key in-session (avoids needing a .env for the demo)
@@ -65,13 +119,11 @@ with st.sidebar:
         st.caption(f"**λ = {lam:.2f}** → the LLM may nudge each score by at most "
                    f"**±{swing_pct:.0f}%**, and only with a written justification.")
 
-    provider = None
-    if model_choice != "Deterministic (no LLM)":
-        provider = get_provider(model_choice)
-        if provider is None:
-            st.warning(f"No working {model_choice} key — using the deterministic fallback.")
-        else:
-            st.success(f"Using {provider.name} ({provider.model})")
+    provider = get_provider(model_choice)
+    if provider is None:
+        st.warning(f"Add a {model_choice} API key above to start — the assistant requires an LLM.")
+    else:
+        st.success(f"Using {provider.name} ({provider.model})")
 
     st.divider()
     st.markdown("**Try:**")
@@ -83,8 +135,12 @@ with st.sidebar:
 # --------------------------------------------------------------------------- #
 # Agent (persisted across reruns so history survives; settings updated live)
 # --------------------------------------------------------------------------- #
+if provider is None:
+    st.info("👈 Choose a model and add its API key in the sidebar to start chatting.")
+    st.stop()
+
 if "agent" not in st.session_state:
-    st.session_state.agent = Agent()
+    st.session_state.agent = Agent(provider)
     st.session_state.messages = []
 agent: Agent = st.session_state.agent
 agent.provider = provider

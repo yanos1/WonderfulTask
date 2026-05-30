@@ -11,7 +11,6 @@ module stays purely deterministic.
 
 from __future__ import annotations
 
-import re
 from typing import Optional
 
 from .regions import resolve_region
@@ -40,14 +39,6 @@ _METRICS = {
 }
 
 LONG_HAUL_MILES = 2500
-
-# common 3-letter English words that collide with real (but unintended) IATA codes;
-# only skipped when the user typed them in lowercase (see find_in_text)
-_CODE_STOPWORDS = {
-    "AND", "THE", "FOR", "ARE", "WAS", "HAS", "CAN", "YOU", "OUT", "WHY", "HOW", "WHO",
-    "ITS", "NOT", "BUT", "ALL", "ANY", "NEW", "TOP", "OUR", "HIS", "HER", "HIM", "SHE",
-    "DID", "GET", "GOT", "LET", "PUT", "SAY", "SEE", "TWO", "WAY", "FEW", "FAR", "OLD",
-}
 
 _repo: Optional[Repository] = None
 _engine: Optional[ScoringEngine] = None
@@ -81,48 +72,6 @@ def resolve_code(query: str) -> Optional[str]:
         matches.sort(key=lambda a: a.get("passengers") or 0, reverse=True)
         return matches[0]["iata"]
     return None
-
-
-def find_in_text(text: str, limit: Optional[int] = None) -> list[str]:
-    """Extract airports mentioned anywhere in free text — explicit IATA codes, city, or
-    full name — ordered by first appearance. Used by the no-LLM fallback router to pull
-    entities out of a full sentence (e.g. "...long-haul flights out of Anchorage?" -> ANC).
-    """
-    repo, _ = _engines()
-    if not text:
-        return []
-    low = text.lower()
-    hits: list[tuple[int, int, str]] = []  # (position, -passengers, code)
-    seen: set[str] = set()
-    # explicit 3-letter codes present in the dataset. A lowercase token is only treated as a
-    # code if it isn't a common English word (so "and"/"the" don't resolve to AND/THE, which
-    # are real but unintended airports); an UPPERCASE token is always taken at face value.
-    for m in re.finditer(r"\b[A-Za-z]{3}\b", text):
-        tok = m.group(0)
-        code = tok.upper()
-        if code in seen:
-            continue
-        if (tok.isupper() or code not in _CODE_STOPWORDS) and repo.exists(code):
-            seen.add(code)
-            hits.append((m.start(), 0, code))
-    # city / name mentions (length-guarded to avoid spurious short-substring matches)
-    for a in repo.all():
-        code = a["iata"]
-        if code in seen:
-            continue
-        pos = -1
-        city = (a.get("city") or "").lower()
-        name = (a.get("name") or "").lower()
-        if len(city) >= 4 and city in low:
-            pos = low.find(city)
-        elif len(name) >= 5 and name in low:
-            pos = low.find(name)
-        if pos >= 0:
-            seen.add(code)
-            hits.append((pos, -(a.get("passengers") or 0), code))
-    hits.sort(key=lambda t: (t[0], t[1]))
-    codes = [c for _, _, c in hits]
-    return codes[:limit] if limit else codes
 
 
 def _slim(scored: dict, rec: dict) -> dict:

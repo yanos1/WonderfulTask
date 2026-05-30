@@ -11,6 +11,8 @@ import os
 from abc import ABC, abstractmethod
 from typing import Iterable, Optional
 
+from .models import Airport
+
 # data/ lives at the repo root, one level above this package
 DEFAULT_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)), "data", "airports.json"
@@ -19,11 +21,11 @@ DEFAULT_PATH = os.path.join(
 
 class Repository(ABC):
     @abstractmethod
-    def get(self, code: str) -> Optional[dict]:
+    def get(self, code: str) -> Optional[Airport]:
         """Return one airport record by IATA code, or None if absent."""
 
     @abstractmethod
-    def all(self) -> list[dict]:
+    def all(self) -> list[Airport]:
         """Return every airport record."""
 
     def find(
@@ -51,16 +53,29 @@ class Repository(ABC):
 
 
 class JsonRepository(Repository):
-    """In-memory repository backed by the ETL output (data/airports.json)."""
+    """In-memory repository backed by the ETL output (data/airports.json).
+
+    Records are validated into typed `Airport` objects at load time, so a malformed
+    dataset fails loud here rather than corrupting a score downstream.
+    """
 
     def __init__(self, path: str = DEFAULT_PATH):
         with open(path, "r", encoding="utf-8") as f:
-            self._data: dict[str, dict] = json.load(f)
+            raw = json.load(f)
+        # Accept the provenance-wrapped form {"_meta": ..., "airports": ...} and, for
+        # back-compat, the older flat form {CODE: {...}}.
+        if isinstance(raw, dict) and isinstance(raw.get("airports"), dict):
+            records, self.meta = raw["airports"], raw.get("_meta", {})
+        else:
+            records, self.meta = raw, {}
+        self._data: dict[str, Airport] = {
+            code.upper(): Airport.from_raw(rec) for code, rec in records.items()
+        }
 
-    def get(self, code: str) -> Optional[dict]:
+    def get(self, code: str) -> Optional[Airport]:
         return self._data.get(str(code).upper())
 
-    def all(self) -> list[dict]:
+    def all(self) -> list[Airport]:
         return list(self._data.values())
 
 

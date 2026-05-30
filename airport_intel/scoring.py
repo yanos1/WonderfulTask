@@ -2,7 +2,7 @@
 
 Expansion Profitability Index (EPI):
 
-    demand    = weighted, percentile-normalized blend of load factor, growth, volume
+    demand    = weighted, percentile-normalized blend of load factor, growth, volume, long-haul mix
     EPI       = demand * Feasibility * 100            (Feasibility in [0.3, 1])
     FinalScore = EPI * clamp(LLMModifier, 1 - λ·MAX_SWING, 1 + λ·MAX_SWING)
 
@@ -28,6 +28,7 @@ DEFAULT_WEIGHTS = {
     "growth": 0.25,        # rising demand
     "delay": 0.10,         # congestion symptom (added when delay data is wired)
     "volume": 0.25,        # absolute demand magnitude
+    "long_haul": 0.10,     # route-mix quality: long-haul skews higher revenue/margin
 }
 # How to pull each demand component's raw value from an airport record.
 _GETTERS = {
@@ -35,6 +36,7 @@ _GETTERS = {
     "growth": lambda a: a.get("pax_growth_yoy"),
     "delay": lambda a: a.get("avg_delay_min"),
     "volume": lambda a: a.get("passengers"),
+    "long_haul": lambda a: a.get("long_haul_pct"),
 }
 _FEASIBILITY_FIELDS = ("runway_count", "runway_length_ft")
 

@@ -65,6 +65,7 @@ airport_intel/               core package — all runtime logic
   tools.py                   deterministic tools (rank / compare / profile / breakdown)
   scoring.py                 EPI engine + bounded, λ-capped LLM modifier
   repository.py              data-access layer (Repository interface; JSON-backed)
+  models.py                  typed, validated Airport record (dict-compatible Mapping)
   regions.py                 US region → state resolution
   llm/                       swappable providers (Gemini | Claude) behind one primitive
 etl/build_airports.py        offline build pipeline (public data → data/airports.json)

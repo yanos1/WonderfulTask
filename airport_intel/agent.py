@@ -5,9 +5,9 @@ The LLM appears only at the edges:
   2. REVISE   - optional bounded, justified score modifier on a ranking shortlist
   3. NARRATE  - turn the deterministic tool result into a professional answer
 
-Everything in the middle (scoring, ranking) is deterministic Python. If no LLM provider
-is configured, the agent degrades gracefully to a keyword router + templated answers, so
-the app is always usable. Conversation history is retained for follow-up questions.
+Everything in the middle (scoring, ranking) is deterministic Python. An LLM provider is
+required -- the agent does not fall back to a keyword router or templated answers.
+Conversation history is retained for follow-up questions.
 """
 
 from __future__ import annotations
@@ -19,7 +19,6 @@ from typing import Optional
 from . import scoring
 from . import tools
 from .llm import LLMProvider
-from .regions import REGIONS, resolve_region
 
 # --------------------------------------------------------------------------- #
 # Prompts
@@ -91,16 +90,6 @@ question. If the message is off-topic, gently steer back to airport investment. 
 invent any airport names, numbers, or scores. You may suggest one example, e.g. "Which
 airports in New England are strong candidates for expansion?\""""
 
-# deterministic fallback when no LLM is configured
-HELP_TEXT = (
-    "Hi! I help identify US airports where renovation or expansion is most likely to be "
-    "profitable, based on passenger and flight capacity. Try asking, for example:\n"
-    "  - Which airports in New England are strong candidates for terminal expansion?\n"
-    "  - Compare LA and Santa Ana airport congestion levels.\n"
-    "  - What is the percentage of long-haul flights out of Anchorage?\n"
-    "  - What is the unmet flight demand in SFO and why?"
-)
-
 
 # --------------------------------------------------------------------------- #
 # Helpers
@@ -131,7 +120,11 @@ _DISPATCH = {
 
 
 class Agent:
-    def __init__(self, provider: Optional[LLMProvider] = None, lam: float = 0.0):
+    def __init__(self, provider: LLMProvider, lam: float = 0.0):
+        if provider is None:
+            raise ValueError(
+                "Agent requires an LLM provider; the deterministic fallback was removed."
+            )
         self.provider = provider
         self.lam = lam
         self.history: list[dict] = []  # [{role, content}] for multi-turn follow-ups
@@ -139,84 +132,22 @@ class Agent:
 
     # -- routing ---------------------------------------------------------- #
     def _route(self, user_message: str) -> dict:
-        if self.provider:
-            msgs = self.history + [{"role": "user", "content": user_message}]
-            try:
-                raw = self.provider.complete(ROUTER_SYSTEM, msgs, json_mode=True)
-                parsed = _parse_json(raw)
-                if parsed and parsed.get("tool"):
-                    return parsed
-            except Exception:
-                pass  # fall through to deterministic routing
-        return self._fallback_route(user_message)
+        """The LLM picks one tool (+args) from the message and conversation history.
 
-    def _fallback_route(self, msg: str) -> dict:
-        low = msg.lower()
-        stripped = low.strip().strip("!?.,")
-        # greeting / thanks / smalltalk / off-topic -> friendly help, never a forced ranking
-        greetings = {"hi", "hello", "hey", "yo", "sup", "hiya", "thanks", "thank you",
-                     "help", "?", "ok", "okay"}
-        greeting_phrases = ("how are you", "how're you", "how are u", "how's it going",
-                            "hows it going", "how do you do", "good morning",
-                            "good afternoon", "good evening", "who are you",
-                            "what can you do", "what do you do")
-        if stripped in greetings or any(p in low for p in greeting_phrases):
-            return {"tool": "none", "args": {}}
-        if (("how" in low or "why" in low or "explain" in low)
-                and ("score" in low or "epi" in low or "comput" in low or "reach" in low)):
-            return {"tool": "explain", "args": {}}
-        # entity tools only fire when an actual airport is present; else fall through to help
-        if "long haul" in low or "long-haul" in low:
-            code = self._guess_airport(msg)
-            if code:
-                return {"tool": "flight_breakdown", "args": {"code": code}}
-        if " vs " in low or "compare" in low:
-            codes = self._guess_airports(msg)
-            if codes:
-                return {"tool": "compare_airports",
-                        "args": {"codes": codes, "metric": self._guess_metric(low)}}
-        if "unmet" in low or "profile" in low or "tell me about" in low or "why" in low:
-            code = self._guess_airport(msg)
-            if code:
-                return {"tool": "airport_profile", "args": {"code": code}}
-        # rank only on a clear ranking/aviation signal (region or intent word); else help
-        region = self._guess_region(low)
-        rank_signals = ("rank", "top ", "best", "strong", "candidate", "expansion",
-                        "expand", "invest", "profitab", "opportunit", "which airport",
-                        "airports in", "terminal", "renovat")
-        if region or any(s in low for s in rank_signals):
-            return {"tool": "rank_region", "args": {"region": region, "limit": 5}}
+        A malformed/unparseable reply defaults to "none" (the LLM help path). There is no
+        deterministic keyword router -- an LLM provider is always required.
+        """
+        msgs = self.history + [{"role": "user", "content": user_message}]
+        raw = self.provider.complete(ROUTER_SYSTEM, msgs, json_mode=True)
+        parsed = _parse_json(raw)
+        if parsed and parsed.get("tool"):
+            return parsed
         return {"tool": "none", "args": {}}
-
-    # -- naive entity guessers (only used when no LLM is configured) ------- #
-    @staticmethod
-    def _guess_region(low: str) -> Optional[str]:
-        for region in REGIONS:
-            if region.replace("-", " ") in low:
-                return region
-        return None
-
-    @staticmethod
-    def _guess_airports(msg: str) -> list[str]:
-        # codes / cities / names mentioned anywhere in the sentence, in order of appearance
-        return tools.find_in_text(msg, limit=2)
-
-    @staticmethod
-    def _guess_airport(msg: str) -> str:
-        found = tools.find_in_text(msg, limit=1)
-        return found[0] if found else ""
-
-    @staticmethod
-    def _guess_metric(low: str) -> str:
-        for m in ("congestion", "volume", "long_haul", "growth", "runways"):
-            if m.replace("_", " ") in low or m in low:
-                return m
-        return "congestion"
 
     # -- bounded reviser -------------------------------------------------- #
     def _revise(self, result: dict) -> dict:
         """Apply a bounded, justified LLM modifier to a ranking shortlist (if λ>0)."""
-        if not self.provider or self.lam <= 0 or result.get("intent") != "rank":
+        if self.lam <= 0 or result.get("intent") != "rank":
             return result
         shortlist = result.get("results", [])
         if not shortlist:
@@ -241,66 +172,23 @@ class Agent:
 
     # -- narration -------------------------------------------------------- #
     def _narrate(self, user_message: str, result: dict) -> str:
-        if self.provider:
-            msgs = [{"role": "user", "content":
-                     f"Question: {user_message}\n\nTool result JSON:\n{json.dumps(result)}"}]
-            try:
-                return self.provider.complete(NARRATOR_SYSTEM, msgs).strip()
-            except Exception:
-                pass
-        return self._fallback_narrate(result)
-
-    @staticmethod
-    def _fallback_narrate(result: dict) -> str:
-        if result.get("error"):
-            return result["error"]
-        intent = result.get("intent")
-        if intent == "rank":
-            lines = [f"Top candidates{' in ' + result['region'] if result.get('region') else ''}:"]
-            for r in result["results"]:
-                score = r.get("final_score", r["epi"])
-                lines.append(f"  - {r['iata']} ({r['city']}): EPI {score}")
-            return "\n".join(lines)
-        if intent == "compare":
-            parts = [f"{r['iata']}: {r.get('display','n/a')}" for r in result["results"] if r.get("iata")]
-            return f"Comparison on {result['metric']} - " + "; ".join(parts)
-        if intent == "profile":
-            u = result["unmet_demand"]
-            return (f"{result['iata']} ({result['city']}): EPI {result['epi']}, "
-                    f"unmet-demand {u['unmet_demand_score']}. " + "; ".join(u["reasons"]))
-        if intent == "flight_breakdown":
-            return f"{result['iata']}: long-haul share {result['long_haul_display']}."
-        return "I couldn't determine how to answer that."
+        msgs = [{"role": "user", "content":
+                 f"Question: {user_message}\n\nTool result JSON:\n{json.dumps(result)}"}]
+        return self.provider.complete(NARRATOR_SYSTEM, msgs).strip()
 
     # -- explain (methodology for the previous scores) -------------------- #
     def _explain(self, user_message: str) -> str:
         prev = self.last_result
-        if self.provider:
-            ctx = json.dumps(prev) if prev else "(no previous scored result this session)"
-            msgs = [{"role": "user", "content":
-                     f"Question: {user_message}\n\nPrevious result JSON:\n{ctx}"}]
-            try:
-                return self.provider.complete(EXPLAIN_SYSTEM, msgs).strip()
-            except Exception:
-                pass
-        # deterministic fallback: spell out the math from the stored sub-scores
-        lines = [METHODOLOGY]
-        for r in (prev or {}).get("results", [])[:5] if prev else []:
-            subs = ", ".join(f"{k} {v}" for k, v in r.get("subscores", {}).items())
-            lines.append(f"\n{r['iata']}: demand={r.get('demand')} × feasibility="
-                         f"{r.get('feasibility')} × 100 = EPI {r.get('epi')}  (sub-scores: {subs})")
-        return "\n".join(lines)
+        ctx = json.dumps(prev) if prev else "(no previous scored result this session)"
+        msgs = [{"role": "user", "content":
+                 f"Question: {user_message}\n\nPrevious result JSON:\n{ctx}"}]
+        return self.provider.complete(EXPLAIN_SYSTEM, msgs).strip()
 
     # -- help / smalltalk (greeting, thanks, or off-topic) ---------------- #
     def _help(self, user_message: str) -> str:
-        if self.provider:
-            try:
-                return self.provider.complete(
-                    HELP_SYSTEM, [{"role": "user", "content": user_message}]
-                ).strip()
-            except Exception:
-                pass
-        return HELP_TEXT
+        return self.provider.complete(
+            HELP_SYSTEM, [{"role": "user", "content": user_message}]
+        ).strip()
 
     # -- public ----------------------------------------------------------- #
     def ask(self, user_message: str) -> dict:

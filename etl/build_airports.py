@@ -20,8 +20,13 @@ import json
 import os
 import urllib.request
 import warnings
+from datetime import datetime, timezone
 
 import pandas as pd
+
+from airport_intel.models import Airport
+
+SCHEMA_VERSION = 1
 
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
 
@@ -207,11 +212,31 @@ def build():
             **runways.get(iata, {"runway_count": 0, "runway_length_ft": 0.0}),
         }
 
+    # Validate every record against the typed schema before publishing: the ETL fails
+    # loud here if it produced a malformed value, instead of shipping a bad dataset.
+    for rec in airports.values():
+        Airport.from_raw(rec)
+
+    meta = {
+        "schema_version": SCHEMA_VERSION,
+        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "record_count": len(airports),
+        "vintages": {
+            "volume_and_growth": CURRENT_YEAR,   # FAA enplanements (current)
+            "structural_ratios": BASE_YEAR,       # load factor, long-haul % (T-100 baseline)
+        },
+        "sources": {
+            "metadata_runways": OURAIRPORTS_AIRPORTS,
+            "segment_ratios": T100_2013,
+            "enplanements": FAA_ENPLANEMENTS,
+        },
+    }
+
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(OUT_PATH, "w") as f:
-        json.dump(airports, f, indent=2)
+        json.dump({"_meta": meta, "airports": airports}, f, indent=2)
 
-    print(f"\nWrote {len(airports)} airports -> {OUT_PATH}\n")
+    print(f"\nWrote {len(airports)} airports (schema v{SCHEMA_VERSION}) -> {OUT_PATH}\n")
     print("Sanity check (named airports from the brief):")
     print(f"  {'IATA':5} {'passengers':>12} {'vint':>5} {'loadF':>6} {'longHaul':>8} {'growth':>7} {'rwys':>4}")
     for code in NAMED:
