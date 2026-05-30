@@ -48,9 +48,10 @@ fill missing airports/regions."""
 METHODOLOGY = """How scores are computed (deterministic Python, not the LLM):
 - EPI = demand x feasibility x 100.
 - demand = weighted blend of percentile-normalized sub-scores: load_factor (0.40),
-  growth (0.25), volume (0.25), delay (0.10) -- weights renormalized over whichever
-  components have data. Each sub-score is the airport's PERCENTILE RANK of that metric
-  across ~900 US airports (so 0.93 means 93rd percentile).
+  growth (0.25), volume (0.25), long_haul (0.10), delay (0.10) -- weights renormalized over
+  whichever components have data (e.g. delay has no data yet, so its weight redistributes).
+  Each sub-score is the airport's PERCENTILE RANK of that metric across ~900 US airports
+  (so 0.93 means 93rd percentile).
 - feasibility = runway count + longest-runway percentile, mapped into [0.3, 1] and used
   as a MULTIPLIER/gate: an airport with little physical room is downgraded even if demand
   is high (this is why a busy but constrained airport like SNA scores lower).

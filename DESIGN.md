@@ -33,10 +33,13 @@ EPI        = demand × Feasibility × 100                       Feasibility ∈ 
 FinalScore = EPI × clamp(LLMModifier, 1 − λ·0.30, 1 + λ·0.30)
 ```
 
-**Demand (the pressure signal).** Each component is **percentile-normalized across all ~900
-airports**, so the EPI is a stable absolute index and any subset (e.g. one region) is
-directly comparable. Load factor is the centerpiece — full planes mean demand is being
-turned away. Components with no data anywhere (currently `delay`) are dropped and their
+**Demand (the pressure signal).** A weighted blend of percentile-normalized components —
+load factor (0.40), growth (0.25), volume (0.25), long-haul mix (0.10), and delay (0.10) —
+each **percentile-normalized across all ~900 airports**, so the EPI is a stable absolute
+index and any subset (e.g. one region) is directly comparable. Load factor is the centerpiece
+— full planes mean demand is being turned away; long-haul mix is a small route-quality nudge
+(long-haul skews to higher revenue/margin). Components with no data anywhere (currently
+`delay`) are dropped and their
 weight **redistributed**, so the formula stays correct as data sources are added. (This is
 exactly how `growth` went live the moment FAA enplanements were wired in.)
 

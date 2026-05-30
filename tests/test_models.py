@@ -45,3 +45,16 @@ def test_optional_fields_may_be_none():
     rec = {**GOOD, "pax_growth_yoy": None, "long_haul_pct": None, "departures": None}
     a = Airport.from_raw(rec)
     assert a.pax_growth_yoy is None and a.long_haul_pct is None and a.departures is None
+
+
+def test_compare_metric_fields_exist_on_airport():
+    """Every compare_airports metric must point at a real Airport field.
+
+    Regression guard for the bug where the 'growth' metric referenced the
+    nonexistent 'pax_growth_cagr' and always rendered 'n/a'.
+    """
+    from airport_intel.models import _FIELD_NAMES
+    from airport_intel.tools import _METRICS
+
+    for metric, (field, _label, _fmt) in _METRICS.items():
+        assert field in _FIELD_NAMES, f"metric '{metric}' -> unknown Airport field '{field}'"

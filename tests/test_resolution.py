@@ -41,3 +41,15 @@ def test_resolve_code_by_iata_and_name():
     assert tools.resolve_code("Santa Ana") == "SNA"
     assert tools.resolve_code("Anchorage") == "ANC"
     assert tools.resolve_code("definitely not an airport zzz") is None
+
+
+@pytest.mark.skipif(not _has_data(), reason="airports.json not built (run python -m etl.build_airports)")
+def test_resolve_code_does_not_substring_match():
+    """'LA' must not resolve to 'atLAnta' (ATL) via a stray substring match.
+
+    Whole-word/token matching only: 'LA' is not a token of any major city, so it
+    resolves to nothing (the LLM router maps 'Los Angeles' -> LAX before we get here).
+    """
+    assert tools.resolve_code("LA") != "ATL"
+    # a real whole-word token still resolves
+    assert tools.resolve_code("Los Angeles") == "LAX"

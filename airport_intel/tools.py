@@ -11,6 +11,7 @@ module stays purely deterministic.
 
 from __future__ import annotations
 
+import re
 from typing import Optional
 
 from .regions import resolve_region
@@ -34,7 +35,7 @@ _METRICS = {
     "volume": ("passengers", "passengers", lambda v: f"{v:,.0f}" if v is not None else "n/a"),
     "passengers": ("passengers", "passengers", lambda v: f"{v:,.0f}" if v is not None else "n/a"),
     "long_haul": ("long_haul_pct", "long-haul share", lambda v: f"{v:.1%}" if v is not None else "n/a"),
-    "growth": ("pax_growth_cagr", "passenger growth", lambda v: f"{v:.1%}" if v is not None else "n/a"),
+    "growth": ("pax_growth_yoy", "passenger growth (YoY)", lambda v: f"{v:.1%}" if v is not None else "n/a"),
     "runways": ("runway_count", "runways", lambda v: f"{v:g}" if v is not None else "n/a"),
 }
 
@@ -63,10 +64,19 @@ def resolve_code(query: str) -> Optional[str]:
     if len(q) == 3 and repo.exists(q):
         return q
     ql = query.strip().lower()
-    # match on city or name substring; prefer the highest-volume match
+
+    def _tokens(text: Optional[str]) -> set[str]:
+        # split on non-alphanumerics so "Los Angeles Intl" -> {los, angeles, intl}
+        return {t for t in re.split(r"[^a-z0-9]+", (text or "").lower()) if t}
+
+    # Match on a whole word in the city/name (or the full string), NOT an arbitrary
+    # substring -- otherwise "LA" matches "atLAnta". Prefer the highest-volume match.
     matches = [
         a for a in repo.all()
-        if ql in (a.get("city") or "").lower() or ql in (a.get("name") or "").lower()
+        if ql == (a.get("city") or "").lower()
+        or ql == (a.get("name") or "").lower()
+        or ql in _tokens(a.get("city"))
+        or ql in _tokens(a.get("name"))
     ]
     if matches:
         matches.sort(key=lambda a: a.get("passengers") or 0, reverse=True)
@@ -208,18 +218,4 @@ def flight_breakdown(code: str) -> dict:
             f"Long-haul share = {lh:.1%}" if lh is not None else "Long-haul share unavailable",
         ],
         "notes": DATA_NOTES,
-    }
-
-
-def live_status(code: str) -> dict:
-    """Live operational status (AeroDataBox). Degrades gracefully without a key."""
-    resolved = resolve_code(code)
-    if not resolved:
-        return {"error": f"Airport '{code}' not found."}
-    # Wired in a later step; without a key we disclose unavailability rather than fail.
-    return {
-        "intent": "live_status",
-        "iata": resolved,
-        "available": False,
-        "note": "Live feed not configured (no AeroDataBox key); using historical baseline.",
     }
