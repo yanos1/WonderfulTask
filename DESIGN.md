@@ -112,11 +112,34 @@ where an index would go if `n` grew.
 
 ## 5. Key tradeoffs
 
- - Talk here about json vs api
- - json vs db
- - the router agent producing json vs llm regular output
- - why no need rag
- - 
+- **Structured-JSON routing, not vendor function-calling.** The router emits a small JSON
+  object (`{tool, args, assumptions}`) that we parse and dispatch ourselves, instead of
+  binding to each SDK's native tool-calling API. The whole provider surface is a single
+  `complete(system, messages, json_mode)` primitive (`llm/base.py`), so Gemini
+  (`gemini-2.5-flash`) and Claude (`haiku`) are fully interchangeable behind one ABC — a
+  one-line swap, no rewrite. The cost is that we own the routing contract rather than leaning
+  on a vendor's tool schema; the payoff is portability, no lock-in to one function-calling
+  dialect, and a router that's just a `string → JSON` function we can unit-test directly.
+- **A built JSON artifact, not a database.** (see §4) The runtime is read-only over ~900
+  records (~340 KB) with no concurrent writes — a pure load → filter → score shape. A single
+  ETL-built JSON loaded into memory beats standing up SQLite/Postgres: zero ops, instant cold
+  start, git-diffable provenance. The cost is no indexing or ad-hoc query engine — but the
+  `Repository` ABC is precisely the seam where a real DB drops in if the data grows orders of
+  magnitude, with no change to tools or scoring.
+- **Deterministic spine, LLM only at the edges.** The model never produces the ranking or any
+  number — it picks a tool + args, then a separate pass narrates strictly from the values the
+  Python tool returned. This is the brief's *"not only an LLM"* requirement made literal: the
+  scoring is reproducible and testable, and the model is confined to intent→tool, numbers→prose,
+  and a *bounded, justified* nudge (§3). The tradeoff is a routing layer to maintain versus
+  letting the model free-form — worth it because outputs stay auditable and scores stay stable
+  across runs and across providers.
+- **No RAG / vector store.** Our knowledge base is ~900 *structured* rows with a fixed schema,
+  not a document corpus. The correct retrieval primitive for structured data is a query
+  (filter/sort by field), not semantic similarity — RAG would bolt on an embedding model, a
+  vector DB, and chunking to answer what is really a `WHERE`/`ORDER BY`. Retrieval earns its
+  place only once we ingest the *unstructured* sources in §7 (master plans, filings, news) to
+  ground the reviser; until then it is pure complexity. Open-ended general-knowledge questions
+  are already handled by the `aviation_qa` route from the model's parametric knowledge.
 
 ## 6. Assumptions, uncertainty & scoping
 
@@ -125,14 +148,34 @@ where an index would go if `n` grew.
   data, OurAirports for metadata of airports and runways
 - **Long-haul is domestic-only** — international segments not yet ingested — so it understates
   long-haul share at international gateways (ANC, SFO).
-- App runs locally - talk about this here
+- **Local, single-process deployment.** The system runs as one Streamlit process — no queue,
+  service mesh, or external DB — which is the right scope for a prototype that must be
+  demoable in a single command. It maps cleanly onto the production path: the same
+  `Repository` and `LLMProvider` seams sit behind a gateway + workers + managed DB without
+  touching the scoring core. State is per-session (`st.session_state`); there is no
+  multi-user persistence because the demo is single-user by design.
 - **Cargo out of scope:** the thesis is passenger/terminal expansion; all-cargo service
   classes are filtered out, so cargo-dominant airports (ANC) are judged on passenger terms.
-- **Feasibility ≠ true headroom:** runways proxy for physical room. couldnt fetch that data in the timeframe
+- **Feasibility ≠ true headroom:** true terminal/land/gate capacity isn't in clean public
+  data, so we proxy with runway count + longest runway and flag it as our lowest-confidence
+  factor (floored at 0.3) rather than overclaim — gathering real capacity data was out of
+  reach in the timeframe.
 
 ## 7. With more time
-1. ** Fetch more data, revise the formula
-2. **Live delays** (AeroDataBox) promoted from display-only to a real EPI signal.
-3. ** A working db with the data loaded.
-4. **Rag? talk about this here
-5. what else?
+1. **More signals, weights re-fit empirically.** Ingest international T-100 segments (accurate
+   long-haul at gateways), real gate/terminal capacity, and on-time performance — then *fit*
+   the demand weights against the ATP backtest instead of asserting them. The backtest harness
+   already turns precision@N into an objective function; this closes the loop.
+2. **Live delays** (AeroDataBox) promoted from display-only to a real EPI signal — the `delay`
+   component already exists in the blend with auto-redistributed weight, so wiring a source
+   activates it with no formula change.
+3. **A real datastore behind the same seam.** Swap the committed JSON for SQLite/Postgres via a
+   new `Repository` implementation — adds indexing, ad-hoc queries, and a write path for
+   incremental ETL refreshes, with zero changes to tools or scoring.
+4. **RAG over unstructured sources.** Index airport master plans, FAA NPIAS reports, and
+   news/filings so the bounded reviser grounds its qualitative nudges in *citable* evidence
+   (announced funding, construction moratoria) rather than parametric memory — this is the
+   point where retrieval finally earns its complexity (see §5).
+5. **Productionization & UX.** A gateway + queue + workers deployment for multi-user
+   concurrency; an eval/regression suite pinning routing accuracy and backtest precision in CI;
+   and UI niceties — trend charts, per-component weight sliders, exportable shortlists.
