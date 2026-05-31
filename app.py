@@ -244,13 +244,25 @@ def render_result(result: dict):
             for s in result["steps"]:
                 st.markdown(f"- {s}")
     # Research mode attaches the web sources the reviser grounded its nudges on — surface
-    # them so the qualitative adjustments are auditable.
-    if result.get("sources"):
-        with st.expander(f"🔬 Sources ({len(result['sources'])}) — research-mode citations"):
-            for s in result["sources"]:
-                title = s.get("title") or s.get("url")
-                url = s.get("url")
-                st.markdown(f"- [{title}]({url})" if url else f"- {title}")
+    # them so the qualitative adjustments are auditable. Whenever the research reviser ran
+    # we ALWAYS show this section (expanded), even with zero sources, so it can never
+    # silently disappear and leave the user wondering whether research mode did anything.
+    sources = result.get("sources") or []
+    if sources or result.get("reviser_mode") == "research":
+        with st.expander(f"🔬 Sources ({len(sources)}) — research-mode citations",
+                         expanded=bool(sources)):
+            if sources:
+                for s in sources:
+                    title = s.get("title") or s.get("url")
+                    url = s.get("url")
+                    snippet = (s.get("snippet") or "").strip()
+                    line = f"- [{title}]({url})" if url else f"- {title}"
+                    if snippet:
+                        line += f" — _{snippet}_"
+                    st.markdown(line)
+            else:
+                st.caption("Research mode ran but the model returned no cited sources for "
+                           "this question, so no nudge was applied (cite-or-discard).")
     # Assumptions & caveats are global to the methodology, so they live once in the
     # top-right "⋮" → About menu rather than under every answer.
 

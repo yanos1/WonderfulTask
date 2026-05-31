@@ -143,6 +143,17 @@ def test_require_source_discards_unsourced_factor():
     assert out["factors"][0]["url"] == "https://faa.gov/y"
 
 
+def test_require_source_keeps_named_source_without_url():
+    # research mode accepts a named source even with no machine URL (Gemini grounding case)
+    out = apply_factors(100.0, [
+        {"reason": "DOT announced a terminal grant", "impact": 0.06,
+         "source": "U.S. DOT 2024"},
+    ], lam=1.0, require_source=True)
+    assert out["modifier"] == 1.06
+    assert out["factors"][0]["source"] == "U.S. DOT 2024"
+    assert "url" not in out["factors"][0]
+
+
 def test_require_source_false_keeps_unsourced_factor():
     # light mode (default): unsourced factors still count, just without a citation
     out = apply_factors(100.0, [

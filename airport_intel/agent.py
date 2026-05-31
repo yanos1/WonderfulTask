@@ -129,12 +129,13 @@ BTS, DOT, the airport authority) over secondary press.
 For each airport you want to adjust, return a LIST of factors. Each factor is:
 - "reason": a SPECIFIC, factual statement drawn from the source (no vague hand-waving)
 - "impact": a signed fractional nudge — +0.08 raises the score ~8%, -0.05 lowers it ~5%
-- "source": the publisher/title of the evidence (e.g. "FAA ATP FY2024 awards")
-- "url": the exact URL you found it at
+- "source": the publisher/title of the evidence (e.g. "FAA ATP FY2024 awards") — REQUIRED
+- "url": the exact URL you found it at — include it whenever you have one
 
-A factor WITHOUT a "url" will be DISCARDED — cite or it does not count. Keep each impact
-small and individually defensible; they add up. Omit any airport you found nothing concrete
-about.
+A factor MUST carry at least a "source" (the publisher/title you got the fact from), and a
+"url" too whenever you have one. A factor with NEITHER will be DISCARDED — cite or it does
+not count. Keep each impact small and individually defensible; they add up. Omit any airport
+you found nothing concrete about.
 
 Some airports include a TRUSTED SEED ("ATP grant on record: ...") — that figure is from our
 own verified funding dataset. If it is decision-relevant, cite it with its given url.
@@ -170,6 +171,14 @@ airports in New England are strong candidates for expansion?\""""
 # --------------------------------------------------------------------------- #
 # Helpers
 # --------------------------------------------------------------------------- #
+def _domain(url: Optional[str]) -> str:
+    """Bare host of a url for a compact inline citation label (e.g. 'faa.gov'); '' if none."""
+    if not url:
+        return ""
+    host = re.sub(r"^https?://", "", url.strip()).split("/")[0]
+    return host[4:] if host.startswith("www.") else host
+
+
 def _parse_json(text: str) -> Optional[dict]:
     """Lenient JSON extraction (handles stray prose / markdown fences)."""
     if not text:
@@ -310,9 +319,39 @@ class Agent:
         shortlist.sort(key=lambda r: r["final_score"], reverse=True)
         result["reviser_applied"] = True
         result["reviser_mode"] = "research"
-        if research.citations:
-            result["sources"] = research.citations
+        # The Sources panel must reflect what actually MOVED scores: the sources on the kept
+        # factors (they passed cite-or-discard). The provider's own text-block citations
+        # (research.citations) are merged in too, but are often empty in JSON-only mode — so
+        # relying on them alone left the panel blank even when every nudge was sourced.
+        sources = self._collect_sources(research.citations, shortlist)
+        if sources:
+            result["sources"] = sources
         return result
+
+    @staticmethod
+    def _collect_sources(provider_citations: list, shortlist: list) -> list:
+        """Merge provider citations + the kept factors' own sources.
+
+        De-duped by URL when one exists, else by source name (Gemini grounding often names a
+        source in prose with no structured URL, so a citation can be url-less but still real).
+        """
+        sources, seen = [], set()
+        for c in provider_citations or []:
+            url = (c.get("url") or "").strip()
+            if url and url not in seen:
+                seen.add(url)
+                sources.append(c)
+        for r in shortlist:
+            for f in r.get("factors", []):
+                url = (f.get("url") or "").strip()
+                source = (f.get("source") or "").strip()
+                key = url or source
+                if not key or key in seen:
+                    continue
+                seen.add(key)
+                sources.append({"title": source or url, "url": url,
+                                "snippet": f.get("reason", "")})
+        return sources
 
     @staticmethod
     def _apply_adjustment(r: dict, adj: dict) -> None:
@@ -320,10 +359,17 @@ class Agent:
         r["final_score"] = adj["final_score"]
         r["modifier"] = adj["modifier"]
         r["factors"] = adj["factors"]
-        # one-line summary for the table: "reason (+8%); reason (-4%)"
-        r["modifier_reason"] = "; ".join(
-            f"{f['reason']} ({f['impact']:+.0%})" for f in adj["factors"]
-        ) or None
+        # one-line summary for the table: "reason (+8%) [source]; ..." — naming the source
+        # inline connects each fact to its citation. The clickable link lives in the Sources
+        # panel (st.dataframe cells don't render links). A research factor always has a url
+        # (cite-or-discard), so fall back to its domain when the model gave no source name;
+        # light-mode factors carry neither, so nothing extra is appended there.
+        parts = []
+        for f in adj["factors"]:
+            label = f.get("source") or _domain(f.get("url"))
+            tag = f" [{label}]" if label else ""
+            parts.append(f"{f['reason']} ({f['impact']:+.0%}){tag}")
+        r["modifier_reason"] = "; ".join(parts) or None
 
     # -- narration -------------------------------------------------------- #
     def _narrate(self, user_message: str, result: dict) -> str:

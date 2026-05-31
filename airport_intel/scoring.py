@@ -160,9 +160,12 @@ def apply_factors(epi: float, factors: Optional[list], lam: float,
     multi-factor analogue of apply_modifier: instead of one opaque scalar the LLM gives
     several small, separately-justified forces that add up and stay transparent.
 
-    With ``require_source=True`` (research mode), a factor with no source URL is discarded —
-    "cite or it doesn't count". A kept factor carries its source/url through so the UI can
-    show an auditable citation next to the nudge.
+    With ``require_source=True`` (research mode), a factor must carry a citation — a source
+    URL or, failing that, a named source (publisher/title) — or it is discarded ("cite or it
+    doesn't count"). A machine URL is preferred (verifiable), but a named source is accepted
+    too: Google-Search grounding often returns the source in prose without a structured URL,
+    so requiring a URL would silently drop every Gemini nudge. A kept factor carries its
+    source/url through so the UI can show the citation next to the nudge.
     """
     kept: list[dict] = []
     net = 0.0
@@ -174,15 +177,15 @@ def apply_factors(epi: float, factors: Optional[list], lam: float,
         if not reason or impact is None:
             continue
         url = (f.get("url") or "").strip()
-        if require_source and not url:
-            continue  # cite-or-discard: an unsourced claim is dropped in research mode
+        source = (f.get("source") or "").strip()
+        if require_source and not url and not source:
+            continue  # cite-or-discard: a factor with neither url nor named source is dropped
         try:
             imp = float(impact)
         except (TypeError, ValueError):
             continue
         net += imp
         factor = {"reason": reason, "impact": round(imp, 4)}
-        source = (f.get("source") or "").strip()
         if source:
             factor["source"] = source
         if url:

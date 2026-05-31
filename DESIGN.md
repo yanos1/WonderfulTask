@@ -19,13 +19,11 @@ output*, while keeping the conversation natural.
 User → Streamlit chat
   1. ROUTE   (LLM)   history → {tool, args}
   2. EXECUTE (code) deterministic tool computes EPI, ranking, breakdowns + a `steps` trace
-  3. REVISE  (LLM)  optional bounded, justified score modifier on a ranking shortlist.
- 
+  3. REVISE  (LLM)  optional bounded, justified score modifier based on knowledge (baisc search) 
+  or deep research and citation (research mode)
   4. NARRATE (LLM)  professional answer grounded strictly in the returned numbers
 ```
 
-Conversation history is retained (`st.session_state`) and passed to the router every turn,
-so follow-ups like *"and what about SFO?"* resolve against prior context.
 
 ## 2. Scoring methodology — Expansion Profitability Index (EPI)
 
@@ -67,60 +65,21 @@ The LLM is confined to the **semantic edges**; all math is deterministic Python.
 | Narrate | yes | prose answer | instructed to use only returned numbers |
 
 **The bounded reviser** is the interesting bit. The deterministic EPI owns the ranking and
-is fully reproducible. The LLM may add a *small, justified* nudge for qualitative signal the
-formula can't see (announced funding, geographic constraints) — but it is **clamped by a
-user-controlled dial λ** (0 = off, 1 = ±30% max), **must cite a reason** (unjustified
-adjustments are dropped), and is shown transparently in the UI as `EPI → modifier(+reason)
-→ FinalScore`. So the LLM is a *governed* scoring contributor, never an override.
+is fully reproducible. The LLM may mutate this score based on knowledge or citations
 
-> This satisfies both halves of the brief: **"not only LLM"** (a reproducible deterministic
-> spine) and **"AI-powered"** (the LLM genuinely participates in routing, scoring, and
-> explanation).
-
-## 4. Data storage
-
-**Access pattern first.** The runtime is **read-only** over ~900 airport records (~340 KB),
-with **no concurrent writes** and **no transactions** — every query is "load the universe,
-filter, score." For that shape, the right store is a **single JSON artifact built offline by
-the ETL** (`etl/build_airports.py` → `data/airports.json`), loaded once into memory. A
-relational/vector DB here would be complexity the access pattern doesn't earn. The store is a
-*materialized view* of public sources, rebuilt by re-running the ETL — not an authored DB.
-
-**The seam is the point.** All runtime code depends only on the `Repository` ABC
-(`repository.py`), never on JSON. `get`/`all`/`find` are the entire contract, so the backing
-store is a **one-file swap** — `JsonRepository` → a SQLite/Postgres implementation — with
-**zero changes to tools or scoring**. That's where indexing and a real query engine would
-land if the dataset grew orders of magnitude.
-
-**Typed, validated records.** Records are not loose dicts: each is parsed into an immutable
-`Airport` (`models.py`) at the load boundary, where `Airport.from_raw` enforces the schema
-(IATA shape, `load_factor`/`long_haul_pct ∈ [0,1]`, non-negative counts) and **fails loud,
-naming the offending field**, instead of letting a bad value silently corrupt a score. The
-ETL validates with the *same* model before publishing, so the schema has one source of truth.
-`Airport` subclasses `Mapping`, so it stays a drop-in for the by-name field access the
-deterministic layer uses while giving new code typed attribute access.
-
-**Provenance.** The artifact is wrapped as `{"_meta": {...}, "airports": {...}}`; `_meta`
-records `schema_version`, `generated_at`, `record_count`, the per-signal vintages (volume/
-growth = 2024, structural ratios = 2024), and the source URLs — so any dataset is auditable
-and reproducible (`repo.meta` exposes it).
-
-**Owned tradeoffs.** (1) The derived `airports.json` is **committed to git** — a deliberate
-choice so the app is demoable immediately without running the ETL or hitting the network;
-the ETL remains the source of truth and can regenerate it. (2) `Repository.find` is a
-**linear scan** — `O(n)` over 10³ rows is negligible, and the `Repository` seam is exactly
-where an index would go if `n` grew.
 
 ## 5. Key tradeoffs
 
-- **Structured-JSON routing, not vendor function-calling.** The router emits a small JSON
-  object (`{tool, args, assumptions}`) that we parse and dispatch ourselves, instead of
-  binding to each SDK's native tool-calling API. The whole provider surface is a single
-  `complete(system, messages, json_mode)` primitive (`llm/base.py`), so Gemini
-  (`gemini-2.5-flash`) and Claude (`haiku`) are fully interchangeable behind one ABC — a
-  one-line swap, no rewrite. The cost is that we own the routing contract rather than leaning
-  on a vendor's tool schema; the payoff is portability, no lock-in to one function-calling
-  dialect, and a router that's just a `string → JSON` function we can unit-test directly.
+
+- Json registry vs API:
+  - Pros
+  - saves run time, no failure, deterministic
+  - Cons
+  - Stale data until loaded new sources.
+  
+- RAG retrieval of data
+    on a vendor's tool schema; the payoff is portability, no lock-in to one function-calling
+    dialect, and a router that's just a `string → JSON` function we can unit-test directly.
 - **A built JSON artifact, not a database.** (see §4) The runtime is read-only over ~900
   records (~340 KB) with no concurrent writes — a pure load → filter → score shape. A single
   ETL-built JSON loaded into memory beats standing up SQLite/Postgres: zero ops, instant cold

@@ -53,11 +53,17 @@ class GeminiProvider(LLMProvider):
         allow = ", ".join(RESEARCH_ALLOWED_DOMAINS)
         system = (system + f"\n\nPrefer these authoritative domains when searching: {allow}. "
                   "Treat any other source with skepticism.")
+        # Gemini 2.x grounding uses the `google_search` tool. The old `google_search_retrieval`
+        # string is 1.5-only and is REJECTED by 2.5 models — passing it threw, and the agent's
+        # try/except silently fell back to the light reviser, so no sources ever appeared. The
+        # `GoogleSearch` message class isn't exported by this SDK build, so we set the proto
+        # field directly with an empty dict (equivalent to GoogleSearch()).
+        search_tool = self._genai.protos.Tool(google_search={})
         model = self._genai.GenerativeModel(
             RESEARCH_MODEL,
             system_instruction=system,
             generation_config={"temperature": 0.2},
-            tools="google_search_retrieval",
+            tools=[search_tool],
         )
         contents = [
             {"role": "user" if m["role"] == "user" else "model", "parts": [m["content"]]}

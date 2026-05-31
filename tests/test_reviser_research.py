@@ -65,6 +65,55 @@ def test_research_mode_applies_cited_nudge_and_attaches_sources():
     assert out["sources"] == citations
 
 
+def test_sources_fall_back_to_factor_urls_when_provider_cites_nothing():
+    # JSON-only research replies often carry NO provider text-citations, yet every kept
+    # factor is sourced. The Sources panel must still populate from the factors' own urls,
+    # and the Why summary must name the source inline.
+    payload = {"airports": [{"iata": "SFO", "factors": [
+        {"reason": "new concourse funded", "impact": 0.06,
+         "source": "FAA ATP FY2024", "url": "https://faa.gov/atp"}]}]}
+    provider = _FakeProvider(research_payload=payload, citations=[])  # provider cites nothing
+    agent = Agent(provider, lam=1.0, research_mode=True)
+
+    out = agent._revise(_rank_result(100.0))
+    row = out["results"][0]
+
+    assert out["sources"] == [{"title": "FAA ATP FY2024", "url": "https://faa.gov/atp",
+                               "snippet": "new concourse funded"}]
+    assert "[FAA ATP FY2024]" in row["modifier_reason"]   # source named inline in Why column
+
+
+def test_why_column_falls_back_to_domain_when_no_source_name():
+    # model gave a url but no "source" field -> inline label uses the bare domain
+    payload = {"airports": [{"iata": "SFO", "factors": [
+        {"reason": "runway extension approved", "impact": 0.04,
+         "url": "https://www.faa.gov/news/x"}]}]}
+    provider = _FakeProvider(research_payload=payload, citations=[])
+    agent = Agent(provider, lam=1.0, research_mode=True)
+
+    row = agent._revise(_rank_result(100.0))["results"][0]
+    assert "[faa.gov]" in row["modifier_reason"]          # www. stripped, path dropped
+
+
+def test_research_named_source_without_url_is_kept_and_listed():
+    # Gemini case: model names a source in prose but returns no structured URL, and the
+    # provider attaches no text-citations. The nudge must still apply and the named source
+    # must appear in the Sources panel (url-less).
+    payload = {"airports": [{"iata": "SFO", "factors": [
+        {"reason": "DOT announced a $5M terminal grant", "impact": 0.05,
+         "source": "U.S. DOT 2024"}]}]}
+    provider = _FakeProvider(research_payload=payload, citations=[])
+    agent = Agent(provider, lam=1.0, research_mode=True)
+
+    out = agent._revise(_rank_result(100.0))
+    row = out["results"][0]
+
+    assert row["modifier"] == 1.05                       # named source counts
+    assert out["sources"] == [{"title": "U.S. DOT 2024", "url": "",
+                               "snippet": "DOT announced a $5M terminal grant"}]
+    assert "[U.S. DOT 2024]" in row["modifier_reason"]
+
+
 def test_research_mode_discards_uncited_factor():
     # one cited, one not — only the cited one may move the score
     payload = {"airports": [{"iata": "SFO", "factors": [
