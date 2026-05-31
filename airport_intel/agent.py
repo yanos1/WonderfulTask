@@ -24,14 +24,17 @@ from typing import Optional
 from . import scoring
 from . import tools
 from .llm import LLMProvider
+from .regions import REGIONS
 
 # --------------------------------------------------------------------------- #
 # Prompts
 # --------------------------------------------------------------------------- #
+_REGION_VOCAB = ", ".join(f'"{r}"' for r in REGIONS)
+
 ROUTER_SYSTEM = """You route airport-investment questions to ONE deterministic tool.
 Tools:
-- rank_region(region, limit, metric): rank airports. region is a US region name like
-  "New England" or null for nationwide. By DEFAULT (metric null) ranks by the Expansion
+- rank_region(region, limit, metric): rank airports. region MUST be one of the canonical
+  region names below (or null for nationwide). By DEFAULT (metric null) ranks by the Expansion
   Profitability Index -- use for "which airports are strong candidates / best / top". If
   the user asks to rank by ONE specific KPI, set metric to one of: congestion (load
   factor), volume, growth, long_haul, runways -- e.g. "rank airports by growth" ->
@@ -52,6 +55,15 @@ Tools:
   (e.g. "hi", "how are you", "what's the capital of France"). Use this whenever the
   message is unrelated to airlines/airports. NEVER force a ranking or any other tool onto
   a non-aviation message, and NEVER use aviation_qa for non-aviation messages.
+
+Canonical regions (rank_region accepts ONLY these exact names): """ + _REGION_VOCAB + """.
+When the user gives a geographic phrase that is not on this list, map it to the CLOSEST
+canonical region instead of passing it through verbatim -- the tool only knows these names
+and will reject anything else. Examples: "north US"/"the northern states" -> "northeast";
+"the northwest" -> "pacific northwest"; "SoCal" -> "southern california"; "the plains" ->
+"midwest". When you map, state the mapping in "assumptions" (e.g. "interpreted 'north US'
+as the northeast region"). If a phrase genuinely fits no region, leave region null and note
+that you ranked nationwide.
 
 Given the conversation, output JSON ONLY:
 {"tool": "<tool name or 'none'>", "args": {...}, "assumptions": ["..."]}

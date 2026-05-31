@@ -143,7 +143,7 @@ with st.expander("📊 Is the EPI any good? — backtest vs $3.8B of real FAA te
 
 
 # --------------------------------------------------------------------------- #
-# Sidebar — model, λ, keys
+# Sidebar — model, λ, research mode (keys come from .env, never the UI)
 # --------------------------------------------------------------------------- #
 with st.sidebar:
     st.header("Settings")
@@ -152,15 +152,9 @@ with st.sidebar:
         help="The LLM that powers routing, explanation, and the bounded score nudge.",
     )
 
-    # let the user paste a key in-session (avoids needing a .env for the demo)
-    if model_choice == "gemini" and not os.getenv("GEMINI_API_KEY"):
-        k = st.text_input("GEMINI_API_KEY", type="password")
-        if k:
-            os.environ["GEMINI_API_KEY"] = k
-    if model_choice == "claude" and not os.getenv("ANTHROPIC_API_KEY"):
-        k = st.text_input("ANTHROPIC_API_KEY", type="password")
-        if k:
-            os.environ["ANTHROPIC_API_KEY"] = k
+    # Keys come exclusively from the environment / .env (loaded at startup) — the API key is
+    # always provisioned out-of-band, so there is no in-app key entry. A missing key surfaces
+    # as the warning below (get_provider returns None), not a prompt.
 
     lam = st.slider(
         "LLM influence (λ)", 0.0, 1.0, 0.5, 0.05,
@@ -194,7 +188,9 @@ with st.sidebar:
 
     provider = get_provider(model_choice)
     if provider is None:
-        st.warning(f"Add a {model_choice} API key above to start — the assistant requires an LLM.")
+        env_var = "ANTHROPIC_API_KEY" if model_choice == "claude" else "GEMINI_API_KEY"
+        st.warning(f"No {model_choice} key found — set {env_var} in the .env file. "
+                   "The assistant requires an LLM.")
     else:
         st.success(f"Using {provider.name} ({provider.model})")
 
@@ -209,7 +205,7 @@ with st.sidebar:
 # Agent (persisted across reruns so history survives; settings updated live)
 # --------------------------------------------------------------------------- #
 if provider is None:
-    st.info("👈 Choose a model and add its API key in the sidebar to start chatting.")
+    st.info("👈 Choose a model whose API key is set in the .env file to start chatting.")
     st.stop()
 
 if "agent" not in st.session_state:
