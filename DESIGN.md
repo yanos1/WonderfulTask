@@ -53,9 +53,6 @@ lets it dampen without nuking a score, and we state its low confidence to the us
 **Why percentile (not min-max).** Robust to mega-hub outliers (one ATL won't crush the
 scale) and reads naturally ("93rd-percentile load factor").
 
-**Unmet demand (Q4).** A standalone indicator = blend of high load factor + growth, returned
-with a plain-language "why", so *"unmet demand in SFO and why"* is answered with numbers,
-not vibes.
 
 ## 3. Where & how AI is used
 
@@ -115,45 +112,27 @@ where an index would go if `n` grew.
 
 ## 5. Key tradeoffs
 
-- **Tool-routing via structured JSON, not vendor function-calling APIs.** One tiny provider
-  interface (`complete`) makes Gemini and Claude fully interchangeable. Tradeoff: we manage
-  routing ourselves instead of using each SDK's native tools — worth it for portability and
-  a clean swap.
-- **Graceful degradation everywhere.** No API key → keyword routing + templated answers.
-  Live/current data unavailable → fall back to baseline and *disclose it*. The app is always
-  demoable; resilience doubles as honest uncertainty communication.
-- **Derived data over a hand-curated seed.** Metrics are computed from bulk public data for
-  ~900 airports, so regional ranking generalizes and "unmet demand" is *derived*, not
-  authored. Tradeoff: more ETL plumbing up front.
-- **Feasibility is a proxy.** True terminal/land capacity isn't in clean public data; we
-  proxy with runways and flag it as low-confidence rather than overclaim.
-- **Scope discipline (deliberately cut):** cargo analysis, multi-agent pipelines, a vector
-  DB, and any distributed infrastructure — none earn their complexity in a prototype. The
-  production path (gateway + queue + workers + DB behind the same `Repository`/`LLMProvider`
-  seams) is described, not built.
+ - Talk here about json vs api
+ - json vs db
+ - the router agent producing json vs llm regular output
+ - why no need rag
+ - 
 
 ## 6. Assumptions, uncertainty & scoping
 
 - **Current throughout:** volume + YoY growth are **current** (FAA CY2024 enplanements,
   2024 vs 2023); load factor and long-haul % are from **2024** BTS T-100 Domestic Segment
-  data, pulled live from TranStats (`etl/fetch_t100_segment.py`, which selects just the seven
-  fields the build needs and zips a single year). ETL is year-parameterized via `BASE_YEAR`.
+  data, OurAirports for metadata of airports and runways
 - **Long-haul is domestic-only** — international segments not yet ingested — so it understates
   long-haul share at international gateways (ANC, SFO).
-- **Why the raw TranStats file (not the easy APIs):** the pre-aggregated NTAD/Socrata 2024
-  views expose passengers by origin but drop **seats and distance**, so they can't produce
-  load factor or long-haul %; only the raw TranStats segment file carries them.
-- **No stale fallback in the ETL:** if the live fetch is unreachable the build fails loud
-  rather than silently shipping an older vintage. The committed `data/airports.json` (already
-  current) is the safety net — a failed rebuild leaves it untouched. Runtime "graceful
-  degradation" is a separate concern (the app degrades to keyword routing without an API key).
+- App runs locally - talk about this here
 - **Cargo out of scope:** the thesis is passenger/terminal expansion; all-cargo service
   classes are filtered out, so cargo-dominant airports (ANC) are judged on passenger terms.
-- **Feasibility ≠ true headroom:** runways proxy for physical room.
+- **Feasibility ≠ true headroom:** runways proxy for physical room. couldnt fetch that data in the timeframe
 
 ## 7. With more time
-1. **International T-100 segments** → accurate long-haul at gateways.
+1. ** Fetch more data, revise the formula
 2. **Live delays** (AeroDataBox) promoted from display-only to a real EPI signal.
-3. **A current-year segment source** → bring load factor to 2024 (removes the mixed vintage).
-4. **RAG over master plans / news** to ground the reviser's qualitative adjustments.
-5. **Voice input**, trend charts, and per-component weight sliders in the UI.
+3. ** A working db with the data loaded.
+4. **Rag? talk about this here
+5. what else?

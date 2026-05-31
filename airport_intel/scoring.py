@@ -6,11 +6,7 @@ Expansion Profitability Index (EPI):
     EPI       = demand * Feasibility * 100            (Feasibility in [0.3, 1])
     FinalScore = EPI * clamp(LLMModifier, 1 - λ·MAX_SWING, 1 + λ·MAX_SWING)
 
-The LLM never computes the base EPI. It may only return *bounded, justified* adjustments —
-either a single modifier (scoring.apply_modifier) or a list of separately-justified factors
-that sum into one (scoring.apply_factors). λ ("llm_influence", 0..1) caps how far it can move
-a score (λ=1 ⇒ ±40%). λ=0 (or a missing/blank justification) ⇒ FinalScore == EPI.
-
+The LLM never computes the base EPI.
 All normalization is by percentile rank across the full airport universe, so the EPI is a
 stable absolute index and any subset ranking (e.g. one region) is directly comparable.
 """
@@ -111,7 +107,7 @@ class ScoringEngine:
         }
 
     def unmet_demand(self, airport: dict) -> dict:
-        """Standalone indicator for the 'unmet demand in X and why' question (Q4)."""
+        """Standalone indicator for the 'unmet demand in X and why' question."""
         lf = self._pct["load_factor"].rank(airport.get("load_factor"))
         gr = self._pct["growth"].rank(airport.get("pax_growth_yoy")) if "growth" in self._pct else None
         parts = [r for r in (lf, gr) if r is not None]

@@ -53,7 +53,6 @@ BASE_YEAR = 2024          # vintage of the segment-level (seats/distance) data; 
 CURRENT_YEAR = 2024       # vintage of FAA enplanement volume + growth
 LONG_HAUL_MILES = 2500    # a flight is "long haul" if its segment distance exceeds this
 # Service classes to KEEP (passenger service). Excludes all-cargo classes G and P,
-# honoring the "ignore cargo" scoping decision.
 PASSENGER_CLASSES = {"F", "L"}
 
 NAMED = ["SFO", "LAX", "SNA", "ANC", "BOS"]  # sanity-check airports from the brief

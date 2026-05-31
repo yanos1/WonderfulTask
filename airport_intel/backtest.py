@@ -6,8 +6,8 @@ treat ATP awards as labels and ask the question every reviewer will ask: **does 
 actually track reality, or is it a nice-looking number?**
 
 Three uses, one artifact:
-  1. PROVE   - precision@N of the EPI vs a volume-only baseline (does EPI beat ranking by
-               size alone?), plus rank correlation with grant dollars.
+  1. PROVE   - precision@N of the EPI against ATP labels (does EPI beat the base rate?),
+               plus rank correlation with grant dollars.
   2. TUNE    - the precision is an objective function for the scoring weights: they can be
                justified empirically instead of asserted (and pinned as a regression test).
   3. LEADS   - the off-diagonal (high EPI, NOT funded) is the investment shortlist: airports
@@ -106,7 +106,7 @@ def run_backtest(
     ns: tuple[int, ...] = DEFAULT_NS,
     min_passengers: int = 250_000,
 ) -> dict:
-    """Score the whole universe, compare EPI vs a volume-only baseline against ATP labels."""
+    """Score the whole universe and measure EPI precision against ATP labels."""
     repo = repo or get_repository()
     funding = load_funding() if funding is None else funding
     airports = repo.all()
@@ -132,17 +132,13 @@ def run_backtest(
     base_rate = round(len(funded_set) / n_universe, 4) if n_universe else 0.0
 
     epi_rank = [r["iata"] for r in sorted(rows, key=lambda r: r["epi"], reverse=True)]
-    vol_rank = [r["iata"] for r in sorted(rows, key=lambda r: r["passengers"], reverse=True)]
 
     precision = []
     for n in ns:
         epi_p = precision_at_n(epi_rank, funded_set, n)
-        vol_p = precision_at_n(vol_rank, funded_set, n)
         precision.append({
             "n": n,
             "epi_precision": round(epi_p, 4),
-            "volume_precision": round(vol_p, 4),
-            "lift_vs_volume": round(epi_p / vol_p - 1, 4) if vol_p > 0 else None,
         })
 
     # rank correlation of EPI with grant dollars across the whole universe (unfunded = $0)
@@ -185,17 +181,21 @@ def format_report(result: dict) -> str:
     L.append("=" * 70)
     L.append("EPI BACKTEST  vs  FAA Airport Terminal Program (ATP) grants")
     L.append("=" * 70)
+    L.append("EPI (Expansion Profitability Index) is a 0-100 score of how worthwhile a")
+    L.append("terminal expansion is at each airport: EPI = demand x feasibility, where")
+    L.append("demand blends load factor, growth, passenger volume and long-haul mix, and")
+    L.append("feasibility reflects runway capacity to build. This backtest checks whether")
+    L.append("that score tracks where competitive FAA ATP grants actually went.")
+    L.append("")
     L.append(f"Universe: {result['universe']} airports | "
              f"ATP-funded in universe: {result['funded_in_universe']} "
              f"(base rate {result['base_rate']:.1%})")
     L.append("")
     L.append("Precision@N - share of the top-N ranking that actually received ATP funding")
     L.append(f"  (vs base rate {result['base_rate']:.0%} = funded share of the whole universe)")
-    L.append(f"  {'N':>4}  {'EPI':>8}  {'volume-only':>12}  {'EPI lift':>9}")
+    L.append(f"  {'Top N':>6}  {'Funded':>8}")
     for p in result["precision"]:
-        lift = f"{p['lift_vs_volume']:+.0%}" if p["lift_vs_volume"] is not None else "  n/a"
-        L.append(f"  {p['n']:>4}  {p['epi_precision']:>7.0%}  "
-                 f"{p['volume_precision']:>11.0%}  {lift:>9}")
+        L.append(f"  {p['n']:>6}  {p['epi_precision']:>7.0%}")
     L.append("")
     L.append(f"Spearman(EPI, grant $) across universe: {result['spearman_epi_grant_usd']:+.3f}")
     q = result["quadrant"]

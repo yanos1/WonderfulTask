@@ -45,11 +45,7 @@ def _opt_number(
 
 @dataclass(frozen=True)
 class Airport(Mapping):
-    """One airport record: identity + demand signals + feasibility inputs.
-
-    Field vintages are encoded in the data, not the type: ``passengers``/``pax_growth_yoy``
-    are current (FAA CY2024) and structural ratios are 2024 BTS T-100 — see DESIGN.md.
-    """
+    """One airport record: identity + demand signals + feasibility inputs."""
 
     # identity / metadata
     iata: str

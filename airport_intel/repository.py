@@ -71,12 +71,14 @@ class JsonRepository(Repository):
         self._data: dict[str, Airport] = {
             code.upper(): Airport.from_raw(rec) for code, rec in records.items()
         }
+        # Records are immutable after load, so materialize the list view once.
+        self._all: list[Airport] = list(self._data.values())
 
     def get(self, code: str) -> Optional[Airport]:
         return self._data.get(str(code).upper())
 
     def all(self) -> list[Airport]:
-        return list(self._data.values())
+        return self._all
 
 
 # convenience singleton for the app (cheap: one small JSON load)

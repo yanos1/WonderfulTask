@@ -7,6 +7,7 @@ import os
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 from dotenv import load_dotenv
 
 from airport_intel import backtest
@@ -43,12 +44,49 @@ def _metrics_md() -> str:
     )
 
 
+def _disable_keyboard_shortcuts() -> None:
+    """Make the app mouse-only by suppressing keyboard activations.
+
+    Streamlit ships built-in hotkeys we don't define ourselves: "C" clears the
+    cache, "R" reruns, and Enter/Return submits the chat box. This injects a
+    capture-phase keydown blocker on the parent document so those keys do nothing
+    — the user must click the ⋮ menu items / the chat send button (mouse) instead.
+    Guarded so reruns don't stack duplicate listeners; scroll/tab keys are left
+    alone since those navigate rather than activate.
+    """
+    components.html(
+        """
+        <script>
+        const w = window.parent;
+        if (!w.__mouseOnly) {
+            w.__mouseOnly = true;
+            w.document.addEventListener('keydown', function (e) {
+                const t = e.target;
+                const typing = t && (t.tagName === 'INPUT' ||
+                                     t.tagName === 'TEXTAREA' || t.isContentEditable);
+                if (typing) {
+                    // Enter/Return would submit — block it; allow normal typing.
+                    if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); }
+                    return;
+                }
+                // Outside a field, swallow Streamlit's global hotkeys: R and C.
+                const k = e.key.toLowerCase();
+                if (k === 'r' || k === 'c') { e.preventDefault(); e.stopPropagation(); }
+            }, true);
+        }
+        </script>
+        """,
+        height=0,
+    )
+
+
 st.set_page_config(
     page_title="Airport Investment Intelligence",
     page_icon="✈️",
     layout="wide",
     menu_items={"About": _ASSUMPTIONS_MD + _metrics_md()},
 )
+_disable_keyboard_shortcuts()
 st.title("✈️ Airport Investment Intelligence Agent")
 st.caption("Ranks US airports for renovation/expansion ROI using a deterministic Expansion "
            "Profitability Index, with an LLM for routing, explanation, and a bounded score nudge.")
@@ -71,10 +109,11 @@ with st.expander("📊 Is the EPI any good? — backtest vs $3.8B of real FAA te
         st.info("Funding ground truth not built yet — run `python -m etl.build_funding`.")
     else:
         st.caption(
+            f"EPI stands for Expansion Profitability Index. It is a measurement created for evaluating airport investments."
             f"Validated against the FAA Airport Terminal Program (ATP), a *competitive* grant "
-            f"program that funds passenger-terminal expansion — the same question the EPI scores. "
+            f" that funds terminal explansion. The correlation between them shows the EPI is a valid measurement. "
             f"{bt['funded_in_universe']} of {bt['universe']} airports were funded "
-            f"(base rate {bt['base_rate']:.0%}); a good index should rank funded airports near the top."
+            f"(base rate {bt['base_rate']:.0%})"
         )
         p20 = next((p for p in bt["precision"] if p["n"] == 20), bt["precision"][0])
         c1, c2, c3 = st.columns(3)
@@ -85,17 +124,14 @@ with st.expander("📊 Is the EPI any good? — backtest vs $3.8B of real FAA te
         c3.metric("Spearman(EPI, grant $)", f"{bt['spearman_epi_grant_usd']:+.2f}",
                   help="Rank correlation between EPI and ATP dollars across all airports.")
 
-        st.markdown("**Precision@N — EPI vs. a volume-only baseline**")
+        st.markdown("**Precision — EPI vs. ATP grants**")
         st.dataframe(pd.DataFrame([
-            {"N": p["n"], "EPI": f"{p['epi_precision']:.0%}",
-             "Volume-only": f"{p['volume_precision']:.0%}",
-             "EPI lift": (f"{p['lift_vs_volume']:+.0%}"
-                          if p["lift_vs_volume"] is not None else "n/a")}
+            {"Top": p["n"], "Funded": f"{p['epi_precision']:.0%}"}
             for p in bt["precision"]
         ]), hide_index=True, use_container_width=True)
-        st.caption("The EPI tracks real funding strongly — and on par with airport size alone, "
-                   "because ATP funding is itself size-driven. So the differentiated output is the "
-                   "*unfunded* high-EPI shortlist below: it deliberately diverges from raw size.")
+        st.caption("The EPI tracks real funding strongly, well above the base rate. The "
+                   "differentiated output is the *unfunded* high-EPI shortlist below: airports "
+                   "the competitive process has not captured yet.")
 
         st.markdown(f"**🎯 Investment shortlist — high EPI, _not yet_ ATP-funded "
                     f"(≥ {bt['shortlist_min_passengers']:,} passengers)**")

@@ -117,10 +117,8 @@ The user asked a genuine aviation question (airlines, airports, air travel, infr
 routes, regulation) that our internal dataset does NOT cover -- our data is limited to US
 airport passenger/flight capacity used for the expansion-profitability scoring.
 
-Answer helpfully from general knowledge in 1-3 short paragraphs. IMPORTANT: open with a
-brief, honest flag that this is general knowledge rather than a result from our dataset, so
-the user does not confuse it with our data-backed scores -- e.g. "This isn't from our
-capacity dataset, but in general...". Do not fabricate specific statistics, dates, or
+Answer helpfully from general knowledge in 1-3 short paragraphs. Try to come up with real data
+ using all tools at your disposal. Do not fabricate specific statistics, dates, or
 figures; if you are unsure, say so plainly. Where natural, connect the answer back to
 airport investment and invite a data-backed question."""
 
