@@ -149,14 +149,20 @@ def apply_modifier(epi: float, modifier: Optional[float], lam: float, reason: Op
     }
 
 
-def apply_factors(epi: float, factors: Optional[list], lam: float) -> dict:
+def apply_factors(epi: float, factors: Optional[list], lam: float,
+                  require_source: bool = False) -> dict:
     """Combine a LIST of justified factors into one bounded modifier.
 
-    Each factor is {"reason": str, "impact": float}, where impact is a signed *fractional*
-    nudge (+0.08 ≈ +8%, -0.05 ≈ -5%). Only factors carrying a concrete reason count; the
-    net modifier is 1 + Σ(impacts), then clamped into the λ band. λ=0 ⇒ no effect. This is
-    the multi-factor analogue of apply_modifier: instead of one opaque scalar the LLM gives
+    Each factor is {"reason": str, "impact": float}, optionally also {"source": str,
+    "url": str} when it came from web research. impact is a signed *fractional* nudge
+    (+0.08 ≈ +8%, -0.05 ≈ -5%). Only factors carrying a concrete reason count; the net
+    modifier is 1 + Σ(impacts), then clamped into the λ band. λ=0 ⇒ no effect. This is the
+    multi-factor analogue of apply_modifier: instead of one opaque scalar the LLM gives
     several small, separately-justified forces that add up and stay transparent.
+
+    With ``require_source=True`` (research mode), a factor with no source URL is discarded —
+    "cite or it doesn't count". A kept factor carries its source/url through so the UI can
+    show an auditable citation next to the nudge.
     """
     kept: list[dict] = []
     net = 0.0
@@ -167,12 +173,21 @@ def apply_factors(epi: float, factors: Optional[list], lam: float) -> dict:
         impact = f.get("impact")
         if not reason or impact is None:
             continue
+        url = (f.get("url") or "").strip()
+        if require_source and not url:
+            continue  # cite-or-discard: an unsourced claim is dropped in research mode
         try:
             imp = float(impact)
         except (TypeError, ValueError):
             continue
         net += imp
-        kept.append({"reason": reason, "impact": round(imp, 4)})
+        factor = {"reason": reason, "impact": round(imp, 4)}
+        source = (f.get("source") or "").strip()
+        if source:
+            factor["source"] = source
+        if url:
+            factor["url"] = url
+        kept.append(factor)
     effective = clamp_modifier(1.0 + net, lam) if kept else 1.0
     return {
         "epi": round(epi, 2),

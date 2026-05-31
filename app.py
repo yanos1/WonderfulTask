@@ -178,6 +178,20 @@ with st.sidebar:
         st.caption(f"**λ = {lam:.2f}** → the LLM may nudge each score by at most "
                    f"**±{swing_pct:.0f}%**, and only with a written justification.")
 
+    # Research mode: the bounded nudge becomes a grounded, cited web lookup. Only meaningful
+    # when λ>0 (there's a nudge to ground), so it's disabled at λ=0.
+    research_mode = st.toggle(
+        "🔬 Research mode — deep web sources",
+        value=False, disabled=(lam == 0.0),
+        help="Off (default): the LLM nudges from its own knowledge — fast, cheap. "
+             "On: the LLM searches the web and may only nudge with a cited source URL "
+             "(slower, more tokens). Lifetime token cost shows in ⋮ → About.",
+    )
+    if research_mode:
+        st.caption("🔬 **Research on** → each nudge is grounded in a cited web source "
+                   "(official/primary preferred). Slower and costs more tokens than the "
+                   "light path; the deterministic EPI is unchanged.")
+
     provider = get_provider(model_choice)
     if provider is None:
         st.warning(f"Add a {model_choice} API key above to start — the assistant requires an LLM.")
@@ -204,6 +218,7 @@ if "agent" not in st.session_state:
 agent: Agent = st.session_state.agent
 agent.provider = provider
 agent.lam = lam
+agent.research_mode = research_mode
 
 
 def render_result(result: dict):
@@ -228,6 +243,14 @@ def render_result(result: dict):
         with st.expander("Deterministic steps"):
             for s in result["steps"]:
                 st.markdown(f"- {s}")
+    # Research mode attaches the web sources the reviser grounded its nudges on — surface
+    # them so the qualitative adjustments are auditable.
+    if result.get("sources"):
+        with st.expander(f"🔬 Sources ({len(result['sources'])}) — research-mode citations"):
+            for s in result["sources"]:
+                title = s.get("title") or s.get("url")
+                url = s.get("url")
+                st.markdown(f"- [{title}]({url})" if url else f"- {title}")
     # Assumptions & caveats are global to the methodology, so they live once in the
     # top-right "⋮" → About menu rather than under every answer.
 

@@ -41,9 +41,18 @@ You ─► Streamlit chat
    DETERMINISTIC TOOLS  ──► rank / compare / profile / flight_breakdown   (EPI math here)
         │
    LLM REVISE (optional, λ-capped, must justify) ──► FinalScore = EPI × clamp(modifier)
+        │           • light (default): nudge from model knowledge — fast, cheap
+        │           • research (opt-in): grounded web search, cite-or-discard, sources shown
         │
    LLM NARRATE  ──► professional answer grounded in the numbers
 ```
+
+**Research mode.** A sidebar toggle (active when λ>0) upgrades the bounded nudge from the
+model's own knowledge to a **grounded deep web lookup**: it searches official/primary
+sources (FAA/BTS/DOT + aviation press) on a heavier model, keeps only factors that carry a
+**cited source URL**, and shows those citations in a Sources panel. It costs more tokens
+(visible in ⋮ → About) and trades byte-reproducibility for auditability — the deterministic
+EPI is untouched in both modes. See [DESIGN.md](DESIGN.md) §3.
 
 - **Data** (`etl/build_airports.py` → `data/airports.json`): OurAirports (metadata, runways)
   + BTS T-100 2024 segment data (load factor, long-haul %) + FAA CY2024 enplanements (current
@@ -95,5 +104,6 @@ python -m pytest -q
 ## With more time
 - Ingest T-100 international segments → accurate long-haul for gateways.
 - Live AeroDataBox delays as a real EPI signal (currently display-only / graceful stub).
-- RAG over airport master plans/news to ground the LLM reviser's qualitative adjustments.
+- Snapshot/cache research-mode sources so a cited nudge replays after the web moves, and
+  cross-check claimed figures against the structured ATP seed before they can move a score.
 - Voice input (browser `webkitSpeechRecognition`).

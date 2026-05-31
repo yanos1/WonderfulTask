@@ -17,9 +17,10 @@ output*, while keeping the conversation natural.
 
 ```
 User → Streamlit chat
-  1. ROUTE   (LLM)  NL + history → {tool, args}
+  1. ROUTE   (LLM)   history → {tool, args}
   2. EXECUTE (code) deterministic tool computes EPI, ranking, breakdowns + a `steps` trace
-  3. REVISE  (LLM)  optional bounded, justified score modifier on a ranking shortlist
+  3. REVISE  (LLM)  optional bounded, justified score modifier on a ranking shortlist.
+ 
   4. NARRATE (LLM)  professional answer grounded strictly in the returned numbers
 ```
 

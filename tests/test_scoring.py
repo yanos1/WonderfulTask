@@ -118,3 +118,36 @@ def test_empty_factor_list_is_neutral():
     assert out["modifier"] == 1.0
     assert out["final_score"] == 100.0
     assert out["factors"] == []
+
+
+# -- research-mode source passthrough + cite-or-discard --------------------- #
+def test_factors_pass_through_source_and_url():
+    out = apply_factors(100.0, [
+        {"reason": "FAA terminal grant", "impact": 0.08,
+         "source": "FAA ATP FY2024", "url": "https://faa.gov/x"},
+    ], lam=1.0)
+    assert out["modifier"] == 1.08
+    assert out["factors"][0]["source"] == "FAA ATP FY2024"
+    assert out["factors"][0]["url"] == "https://faa.gov/x"
+
+
+def test_require_source_discards_unsourced_factor():
+    # research mode: a factor with no URL is dropped even though it has a reason+impact
+    out = apply_factors(100.0, [
+        {"reason": "vague unsourced claim", "impact": 0.10},
+        {"reason": "cited claim", "impact": 0.05,
+         "source": "FAA", "url": "https://faa.gov/y"},
+    ], lam=1.0, require_source=True)
+    assert out["modifier"] == 1.05            # only the cited factor counts
+    assert len(out["factors"]) == 1
+    assert out["factors"][0]["url"] == "https://faa.gov/y"
+
+
+def test_require_source_false_keeps_unsourced_factor():
+    # light mode (default): unsourced factors still count, just without a citation
+    out = apply_factors(100.0, [
+        {"reason": "model-knowledge nudge", "impact": 0.10},
+    ], lam=1.0)
+    assert out["modifier"] == 1.10
+    assert len(out["factors"]) == 1
+    assert "url" not in out["factors"][0]
