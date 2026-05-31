@@ -112,3 +112,4 @@ move a score.
    concurrency and persistent history.
 4. Focus a tiny bit more on user experience. It's already good but not perfect.
 5. logging system so i can trace the exact path of what happens to each messege and analyze for better agentic loop and debugging.
+6. trace when the keys are running low and add funding when they deplete.

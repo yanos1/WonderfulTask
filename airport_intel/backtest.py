@@ -146,6 +146,7 @@ def run_backtest(
 
     # 2x2 quadrant: "high EPI" = top quartile by EPI
     epis_sorted = sorted((r["epi"] for r in rows))
+    # EPI value at the top-quartile boundary (index clamped to a valid position)
     idx = max(0, min(len(epis_sorted) - 1, int(len(epis_sorted) * (1 - HIGH_EPI_QUANTILE))))
     high_cut = epis_sorted[idx]
     quad = {"high_funded": 0, "high_unfunded": 0, "low_funded": 0, "low_unfunded": 0}

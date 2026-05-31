@@ -1,13 +1,9 @@
 """LLM usage metrics: count calls, tokens, and estimated cost, persisted monotonically.
 
-Every LLM call flows through ``LLMProvider.complete()``, so that is the single choke point
-where we meter usage -- nothing can slip past uncounted. Totals accumulate in a small JSON
-file and only ever grow: they survive restarts and are never reset to zero, so the menu's
-"Metrics" panel reports *lifetime* usage of the tool.
-
-Cost is an ESTIMATE: published per-model $/MTok rates (input, output) applied to the token
-counts the SDKs return (Claude ``resp.usage``, Gemini ``resp.usage_metadata``). Rates live
-in ``PRICING`` and are trivial to update as vendor pricing changes.
+Every LLM call flows through the providers' metering, so nothing slips past uncounted.
+Totals accumulate in a small JSON file and only ever grow (survive restarts, never reset),
+so the menu's "Metrics" panel reports lifetime usage. Cost is an ESTIMATE: published
+per-model $/MTok rates in ``PRICING`` applied to the token counts the SDKs return.
 """
 
 from __future__ import annotations
@@ -18,9 +14,8 @@ import threading
 from dataclasses import asdict, dataclass
 from typing import Optional
 
-# Approximate public list prices in USD per 1,000,000 tokens, as (input, output).
-# Estimates only -- keyed by a model-name prefix so dated suffixes still match. The first
-# two are the app's actual defaults (see llm/base.py); the rest cover likely swaps.
+# Approximate public list prices in USD per 1M tokens, as (input, output). Keyed by a
+# model-name prefix so dated suffixes still match.
 PRICING: dict[str, tuple[float, float]] = {
     "gemini-2.5-flash": (0.30, 2.50),
     "gemini-2.5-pro": (1.25, 10.00),

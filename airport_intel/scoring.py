@@ -51,7 +51,7 @@ class _Percentiler:
         if n == 1:
             return 0.5
         below = bisect.bisect_left(self._sorted, value)
-        return below / (n - 1)
+        return below / (n - 1)  # fraction of the universe below this value = its percentile
 
 
 class ScoringEngine:
@@ -153,19 +153,11 @@ def apply_factors(epi: float, factors: Optional[list], lam: float,
                   require_source: bool = False) -> dict:
     """Combine a LIST of justified factors into one bounded modifier.
 
-    Each factor is {"reason": str, "impact": float}, optionally also {"source": str,
-    "url": str} when it came from web research. impact is a signed *fractional* nudge
-    (+0.08 ≈ +8%, -0.05 ≈ -5%). Only factors carrying a concrete reason count; the net
-    modifier is 1 + Σ(impacts), then clamped into the λ band. λ=0 ⇒ no effect. This is the
-    multi-factor analogue of apply_modifier: instead of one opaque scalar the LLM gives
-    several small, separately-justified forces that add up and stay transparent.
-
-    With ``require_source=True`` (research mode), a factor must carry a citation — a source
-    URL or, failing that, a named source (publisher/title) — or it is discarded ("cite or it
-    doesn't count"). A machine URL is preferred (verifiable), but a named source is accepted
-    too: Google-Search grounding often returns the source in prose without a structured URL,
-    so requiring a URL would silently drop every Gemini nudge. A kept factor carries its
-    source/url through so the UI can show the citation next to the nudge.
+    Each factor is {"reason", "impact"} — impact a signed fraction (+0.08 ≈ +8%) — plus an
+    optional {"source", "url"} from web research. The net modifier is 1 + Σ(impacts) clamped
+    into the λ band; factors with no reason are dropped, and λ=0 ⇒ no effect. With
+    ``require_source=True`` (research mode) a factor must carry a url or a named source or it
+    is discarded ("cite or it doesn't count"); a kept factor carries its citation through.
     """
     kept: list[dict] = []
     net = 0.0

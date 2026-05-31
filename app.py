@@ -45,14 +45,11 @@ def _metrics_md() -> str:
 
 
 def _disable_keyboard_shortcuts() -> None:
-    """Make the app mouse-only by suppressing keyboard activations.
+    """Make the app mouse-only by suppressing Streamlit's built-in hotkeys.
 
-    Streamlit ships built-in hotkeys we don't define ourselves: "C" clears the
-    cache, "R" reruns, and Enter/Return submits the chat box. This injects a
-    capture-phase keydown blocker on the parent document so those keys do nothing
-    — the user must click the ⋮ menu items / the chat send button (mouse) instead.
-    Guarded so reruns don't stack duplicate listeners; scroll/tab keys are left
-    alone since those navigate rather than activate.
+    Streamlit ships hotkeys we don't define — "C" clears the cache, "R" reruns, Enter submits
+    — so this injects a capture-phase keydown blocker that swallows them (the user clicks
+    instead). Guarded so reruns don't stack duplicate listeners.
     """
     components.html(
         """
@@ -239,10 +236,8 @@ def render_result(result: dict):
         with st.expander("Deterministic steps"):
             for s in result["steps"]:
                 st.markdown(f"- {s}")
-    # Research mode attaches the web sources the reviser grounded its nudges on — surface
-    # them so the qualitative adjustments are auditable. Whenever the research reviser ran
-    # we ALWAYS show this section (expanded), even with zero sources, so it can never
-    # silently disappear and leave the user wondering whether research mode did anything.
+    # Research mode attaches its web sources; always show this section when research ran (even
+    # with zero sources) so it can't silently disappear.
     sources = result.get("sources") or []
     if sources or result.get("reviser_mode") == "research":
         with st.expander(f"🔬 Sources ({len(sources)}) — research-mode citations",

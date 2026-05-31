@@ -1,18 +1,10 @@
 """Agent orchestration: route -> execute (deterministic) -> revise (bounded LLM) -> narrate.
 
-The LLM appears only at the edges:
-  1. ROUTE    - pick a tool + args from natural language (json_mode)
-  2. REVISE   - optional bounded, justified score modifier on a ranking shortlist
-  3. NARRATE  - turn the deterministic tool result into a professional answer
-
-The reviser has two modes. LIGHT (default) nudges from the model's own parametric
-knowledge. RESEARCH (opt-in, costs more tokens) does a grounded deep web lookup via the
-provider's native web search and may only nudge on factors backed by a cited source URL;
-the real ATP grant dollars from funding.json are injected as a trusted seed.
-
-Everything in the middle (scoring, ranking) is deterministic Python. An LLM provider is
-required -- the agent does not fall back to a keyword router or templated answers.
-Conversation history is retained for follow-up questions.
+The LLM appears only at the edges (ROUTE a tool from natural language, optionally REVISE the
+score within bounds, NARRATE the result); everything in between is deterministic Python. The
+reviser has two modes: LIGHT (default) nudges from the model's own knowledge, RESEARCH
+(opt-in) does a grounded web lookup and may only nudge on cited factors. An LLM provider is
+required — there is no keyword-router fallback — and history is kept for follow-ups.
 """
 
 from __future__ import annotations
@@ -331,10 +323,9 @@ class Agent:
         shortlist.sort(key=lambda r: r["final_score"], reverse=True)
         result["reviser_applied"] = True
         result["reviser_mode"] = "research"
-        # The Sources panel must reflect what actually MOVED scores: the sources on the kept
-        # factors (they passed cite-or-discard). The provider's own text-block citations
-        # (research.citations) are merged in too, but are often empty in JSON-only mode — so
-        # relying on them alone left the panel blank even when every nudge was sourced.
+        # Sources come from the kept factors (what actually moved scores), merged with the
+        # provider's own citations — which are often empty in JSON-only mode, so we can't rely
+        # on them alone.
         sources = self._collect_sources(research.citations, shortlist)
         if sources:
             result["sources"] = sources
@@ -371,11 +362,9 @@ class Agent:
         r["final_score"] = adj["final_score"]
         r["modifier"] = adj["modifier"]
         r["factors"] = adj["factors"]
-        # one-line summary for the table: "reason (+8%) [source]; ..." — naming the source
-        # inline connects each fact to its citation. The clickable link lives in the Sources
-        # panel (st.dataframe cells don't render links). A research factor always has a url
-        # (cite-or-discard), so fall back to its domain when the model gave no source name;
-        # light-mode factors carry neither, so nothing extra is appended there.
+        # One-line table summary: "reason (+8%) [source]; ...". The clickable link lives in
+        # the Sources panel (dataframe cells can't render links); fall back to the url's
+        # domain when the model gave no source name.
         parts = []
         for f in adj["factors"]:
             label = f.get("source") or _domain(f.get("url"))

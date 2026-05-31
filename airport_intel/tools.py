@@ -45,9 +45,8 @@ MAX_RANK_LIMIT = 50  # hard cap so a runaway "list everything" stays a sane shor
 def _clean_limit(limit, default: int = 5) -> int:
     """Coerce a router-supplied limit into [1, MAX_RANK_LIMIT].
 
-    The LLM can hand us junk: None, 0, a negative number (which would make scored[:limit]
-    silently drop from the END of the list), or a non-int string like "5.5" (which would
-    raise). Normalize all of it instead of crashing or mis-slicing.
+    The LLM can hand us junk (None, 0, negatives that would mis-slice, non-int strings that
+    would raise), so normalize all of it instead of crashing.
     """
     try:
         n = int(float(limit))

@@ -1,19 +1,9 @@
 """Typed, validated record schema for the airport dataset.
 
-`Airport` is the single source of truth for what one record looks like. Two design choices
-make it pull its weight without forcing a rewrite of the deterministic layer:
-
-  * **Immutable + typed.** A frozen dataclass: fields are documented and type-annotated in
-    one place, and records can't be mutated out from under the scoring engine.
-  * **Dict-compatible (a `Mapping`).** The tools/scoring access fields by *dynamic* string
-    name (e.g. ``a.get("load_factor")``, ``a["iata"]``). Subclassing ``Mapping`` means an
-    ``Airport`` is a drop-in for the plain dicts those call sites (and the unit tests) used
-    before — ``.get`` / ``[]`` / ``in`` all work — while new code can use typed attribute
-    access (``a.load_factor``).
-
-Validation lives in :meth:`Airport.from_raw`, which is the load-time boundary: a malformed
-record fails loud *here* (with the offending field named) instead of silently propagating a
-bad value into a score.
+`Airport` is a frozen dataclass that also subclasses `Mapping`, so it's immutable and typed
+yet still a drop-in for the plain dicts the tools/scoring access by string key (``a.get(...)``,
+``a["iata"]``). Validation lives in `from_raw`, the load-time boundary: a malformed record
+fails loud there (with the offending field named) instead of corrupting a score downstream.
 """
 
 from __future__ import annotations
